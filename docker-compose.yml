@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  car-catalog-db:
+    image: mongodb/mongodb-community-server:latest
+    container_name: car-catalog-db
+    volumes:
+      - car-catalog-db-data:/data/db
+      - ./databases/CarCatalogDB/init:/docker-entrypoint-initdb.d
+    networks:
+      - micro-net
+    ports:
+      - "27017:27017"
+
+  car-catalog-service:
+    build: ./Services/CarCatalogService
+    environment:
+      MONGO_URI: mongodb://car-catalog-db:27017/car-catalog
+    depends_on:
+      - car-catalog-db
+    networks:
+      - micro-net
+
+volumes:
+  car-catalog-db-data:
+
+networks:
+  micro-net:
+    driver: bridge
