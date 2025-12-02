@@ -19,7 +19,7 @@ services:
     ports:
       - "5001:5001" # Map the container port to the host port
     environment:
-      MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog" # Use the service name as the hostname
+      MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog-db" # Use the service name as the hostname
     volumes:
       - ./CarCatalogService/Service:/app # Mount the local directory to the container
     depends_on:
