@@ -40,7 +40,7 @@ services:
     volumes:
       - authorization-db:/data/db # Persist the data locally
     ports:
-      - "27117:27117" # Map the container port to the host port
+      - "27018:27018" # Map the container port to the host port
 
 
 volumes:
