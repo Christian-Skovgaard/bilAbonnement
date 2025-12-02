@@ -1,28 +1,53 @@
 services:
-  car-catalog-db:
-    image: mongodb/mongodb-community-server:latest
-    container_name: car-catalog-db
-    volumes:
-      - car-catalog-db-data:/data/db
-      - ./databases/CarCatalogDB/init:/docker-entrypoint-initdb.d
-    networks:
-      - micro-net
+  gateway:
+    container_name: gateway
+    build:
+      context: ./APIGateway # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
     ports:
-      - "27017:27017"
+      - "5000:5000" # Map the container port to the host port
+    volumes:
+      - ./APIGateway:/app # Mount the local directory to the container
+    depends_on:
+      - authorization-db # Wait for the mongo service to be ready
 
   car-catalog-service:
-    build: ./Services/CarCatalogService
+    container_name: car-catalog-service
+    build:
+      context: ./CarCatalogService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
     ports:
-      - "5000:5000"
+      - "5001:5001" # Map the container port to the host port
     environment:
-      MONGO_URI: mongodb://car-catalog-db:27017/car-catalog
+      MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog" # Use the service name as the hostname
+    volumes:
+      - ./CarCatalogService/Service:/app # Mount the local directory to the container
     depends_on:
-      - car-catalog-db
-    networks:
-      - micro-net
+      - car-catalog-db # Wait for the mongo service to be ready
+
+  car-catalog-db:
+    container_name: car-catalog-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - car-catalog-db:/data/db # Persist the data locally
+      - ./CarCatalogService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27017:27017" # Map the container port to the host port
+
+  authorization-db:
+    container_name: authorization-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - authorization-db:/data/db # Persist the data locally
+    ports:
+      - "27117:27117" # Map the container port to the host port
+
 
 volumes:
-  car-catalog-db-data:
+  car-catalog-db:
+    driver: local # Use the local volume driver
+  authorization-db:
+    driver: local # Use the local volume driver
 
 networks:
   micro-net:
