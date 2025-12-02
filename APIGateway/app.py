@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Service URLs (internal Docker network)
-CAR_CATALOG_SERVICE = "http://car-catalog-service:5001"
+CAR_CATALOG_SERVICE = "http://car-catalog-service:5002"
 
 
 # Account Service routes
@@ -17,4 +17,4 @@ def getAllCars():
     return jsonify(response.json()), response.status_code
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False)
