@@ -5,7 +5,7 @@ services:
       context: ./APIGateway # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
     ports:
-      - "5000:5000" # Map the container port to the host port
+      - "5001:5001" # Map the container port to the host port
     volumes:
       - ./APIGateway:/app # Mount the local directory to the container
     depends_on:
@@ -17,7 +17,7 @@ services:
       context: ./CarCatalogService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
     ports:
-      - "5001:5001" # Map the container port to the host port
+      - "5002:5002" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog-db" # Use the service name as the hostname
     volumes:

@@ -24,4 +24,4 @@ def get_cars():
     return jsonify([car_to_dict(c) for c in cars])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5002)
