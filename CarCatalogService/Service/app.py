@@ -7,6 +7,7 @@ connect(db='car-catalog-db', host='car-catalog-db', port=27017)
 
 app = Flask(__name__)
 
+# Car Document Model
 class Car(Document):
     make = StringField(required=True)
     model = StringField(required=True)
@@ -14,16 +15,20 @@ class Car(Document):
     stelNR = StringField(required=True)
     meta = {"collection": "cars"}
 
+# Helper function to convert Car document to dictionary
 def car_to_dict(car):
     d = car.to_mongo().to_dict()
     d['id'] = str(d.pop('_id'))
     return d
 
+
+#Get all cars
 @app.route('/cars', methods=['GET'])
 def get_cars():
     cars = Car.objects()
     return jsonify([car_to_dict(c) for c in cars])
 
+#Add a new car
 @app.route('/cars', methods=['POST'])
 def add_car():
     data = request.get_json(force=True)
@@ -35,6 +40,7 @@ def add_car():
     car.save()
     return jsonify(car_to_dict(car)), 201
 
+#get cars by query parameters
 @app.route('/cars/query', methods=['GET'])
 def search_cars():
     # Get query parameters
@@ -60,6 +66,21 @@ def search_cars():
     # Query database
     cars = Car.objects(**filters)
     return jsonify([car_to_dict(c) for c in cars])
+
+#Change car details by stelNR
+@app.route('/cars/stelnr/<stelNR>', methods=['PUT'])
+def update_car(stelNR):
+    data = request.get_json(force=True)
+    car = Car.objects(stelNR=stelNR).first()
+    if not car:
+        return jsonify({"error": "Car not found"}), 404
+    
+    car.make = data.get('make', car.make)
+    car.model = data.get('model', car.model)
+    car.year = data.get('year', car.year)
+    car.stelNR = data.get('stelNR', car.stelNR)
+    car.save()
+    return jsonify(car_to_dict(car))
 
 
 if __name__ == '__main__':
