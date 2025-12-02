@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   car-catalog-db:
     image: mongodb/mongodb-community-server:latest
@@ -14,6 +12,8 @@ services:
 
   car-catalog-service:
     build: ./Services/CarCatalogService
+    ports:
+      - "5000:5000"
     environment:
       MONGO_URI: mongodb://car-catalog-db:27017/car-catalog
     depends_on:
