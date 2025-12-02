@@ -13,8 +13,6 @@ with st.container(border=True):
     st.write(str(username))
 
     st.html(f'''
-            <form action="./cars?username=Victor&password=1234">
-                <input type="hidden" name="username" value={username}/>
-                <input type="hidden" name="password" value={password}/>
+            <form action="./cars">
                 <input type="submit" value="Log ind"/>
             </form>''')
