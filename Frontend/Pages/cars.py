@@ -5,10 +5,16 @@ import requests
 # Data
 cars = []
 
-# Funktioner
+
+# Logik
+def queryParamsToString():
+    queryString = "?"
+    for key, value in st.query_params.items():
+        queryString += f"{key}={value}&"
+    return queryString[0:len(queryString)-1] # Remove the last "&".
+
 try:
     response = requests.get('http://localhost:5001/cars')
-    print(response.status_code)
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
@@ -29,6 +35,24 @@ with col2:
     st.subheader("Hej Victor!")
     if st.button(label="Log ud"):
         st.switch_page("login.py") # Manglende funktionalitet (Fjern JWT i cookies)
+
+with st.container(border=True):
+    carsPageBtn, damageRegiBtn, dealershipBtn, subscriptionsBtn, customerSuppBtn = st.columns(5)
+    with carsPageBtn:
+        if st.button(label="Biler", type="primary"):
+            st.query_params = {}
+
+    with damageRegiBtn:
+        st.button(label="Skader")
+
+    with dealershipBtn:
+        st.button(label="Forhandler")
+
+    with subscriptionsBtn:
+        st.button(label="Abonnementer")
+
+    with customerSuppBtn:
+        st.button(label="Kundeservice")
 
 carLeft, carRight = st.columns([6,4])
 with carLeft:
@@ -55,9 +79,9 @@ with carRight:
 
         yearCol, propellantCol = st.columns(2)
         with yearCol:
-            modelYear = st.number_input(label="Årstal", step=1, placeholder="Indtast årstal")
+            modelYear = st.number_input(label="Årstal", step=1, placeholder="Indtast årstal", value=None)
         with propellantCol:
-            propellant = st.selectbox(label="Drivmiddel", options=("Benzin", "El", "Hybrid"))
+            propellant = st.selectbox(label="Drivmiddel", options=("Alle", "Benzin", "El", "Hybrid"))
 
         maxKm = 500000 # Kan finde max km. kørt fra database
         kmDriven = st.slider(label="Max km. kørt", min_value=0, max_value=maxKm, value=maxKm, step=10000)
@@ -70,9 +94,20 @@ with carRight:
             st.query_params["regNr"] = regNr
             st.query_params["brand"] = brand
             st.query_params["model"] = model
-            st.query_params["modelYear"] = modelYear
-            st.query_params["propellant"] = propellant
+            if modelYear == None:
+                st.query_params["modelYear"] = "" # Hvis "None" sæt til tom string.
+            else:
+                st.query_params["modelYear"] = modelYear
+            if propellant == "Alle":
+                st.query_params["propellant"] = "" # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
+            else:
+                st.query_params["propellant"] = propellant
             st.query_params["kmDriven"] = kmDriven
             st.query_params["monthlyMin"] = monthlyPrice[0] # min
             st.query_params["monthlyMax"] = monthlyPrice[1] # max
             st.rerun()
+        
+        if st.button(label="test"):
+            for key, value in st.query_params.items() :
+                print (key, value)
+            print(len(st.query_params), queryParamsToString())
