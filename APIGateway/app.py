@@ -28,6 +28,11 @@ def addCar():
     response = requests.post(f"{CAR_CATALOG_SERVICE}/cars", json=data)
     return jsonify(response.json()), response.status_code
 
+@app.route('/cars/stelnr/<stelNR>', methods=['PUT'])
+def getCarByStelNR(stelNR):
+    data = request.get_json(force=True)
+    response = requests.put(f"{CAR_CATALOG_SERVICE}/cars/stelnr/{stelNR}", json=data)
+    return jsonify(response.json()), response.status_code
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
