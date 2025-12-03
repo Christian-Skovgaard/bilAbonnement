@@ -2,17 +2,8 @@ from flask import Flask, jsonify, request
 import pymongo
 
 myclient = pymongo.MongoClient("mongodb://car-catalog-db:27017")
-print("Databases before connection")
-print(myclient.list_database_names())
-
 mydb = myclient["car-catalog-db"] # Choose database "car-catalog-db"
-
-
-print(mydb.list_collection_names())
-
 mycol = mydb["cars"] # Choose collection
-
-print(mydb.list_collection_names())
 
 app = Flask(__name__)
 
