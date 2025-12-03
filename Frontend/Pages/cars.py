@@ -58,16 +58,20 @@ with st.container(border=True):
             st.rerun()
 
     with damageRegiBtn:
-        st.button(label="Skader")
+        if st.button(label="Skader"):
+            st.switch_page("pages/damages.py")
 
     with dealershipBtn:
-        st.button(label="Forhandler")
+        if st.button(label="Forhandler"):
+            st.switch_page("pages/dealership.py")
 
     with subscriptionsBtn:
-        st.button(label="Abonnementer")
+        if st.button(label="Abonnementer"):
+            st.switch_page("pages/subscriptions.py")
 
     with customerSuppBtn:
-        st.button(label="Kundeservice")
+        if st.button(label="Kundeservice"):
+            st.switch_page("pages/customersupport.py")
 
 carLeft, carRight = st.columns([6,4])
 with carLeft:
