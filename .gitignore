@@ -1,1 +1,4 @@
 .venv
+restartDocker.sh
+__pycache__
+pycache
