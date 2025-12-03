@@ -19,7 +19,7 @@ app = Flask(__name__)
 # Get all cars
 @app.route('/cars', methods=['GET'])
 def get_cars():
-    cursor = mycol.find({}, {"_id": 0}) # Remove MongoDB _id (surpressing _id)
+    cursor = mycol.find({}, {"_id": 0}) # Query and remove MongoDB _id (surpress_id)
     cars = list(cursor)
     return jsonify(cars)
 
@@ -30,11 +30,11 @@ def search_cars():
     query = []
     for key, value in queryParams.items():
         if value != "":
-            query.append({key: value})
+            query.append({key: value}) # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
 
     cursor = mycol.find({
        "$and": query
-    }, {"_id": 0}) # Remove MongoDB _id (surpressing _id)
+    }, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
     cars = list(cursor)
     return jsonify(cars)
 
