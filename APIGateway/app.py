@@ -6,6 +6,7 @@ import os
 app = Flask(__name__)
 
 # Service URLs (internal Docker network)
+
 services = {
     "car-catalog-service": "http://car-catalog-service:5002",
     "authorization-service": "http://authorization-service:5004"
@@ -124,6 +125,16 @@ def addCar():
 def getCarByStelNR(stelNR):
     data = request.get_json(force=True)
     response = requests.put(f"{CAR_CATALOG_SERVICE}/cars/stelnr/{stelNR}", json=data)
+    return jsonify(response.json()), response.status_code
+
+
+
+@app.route('/complaints', methods=['GET'])
+def getAllComplaints():
+    #auth_header = request.headers.get('Authorization')
+    #headers = {'Authorization': auth_header} if auth_header else {}
+    #response = requests.get(f"{ACCOUNT_SERVICE_URL}/profile", headers=headers)
+    response = requests.get(f"{CUSTOMER_SERVICE}/complaints")
     return jsonify(response.json()), response.status_code
 
 if __name__ == '__main__':

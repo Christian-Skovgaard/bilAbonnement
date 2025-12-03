@@ -71,12 +71,41 @@ services:
     networks:
       - micro-net      
 
+     
+
+
+
+  customer-support-service:
+    container_name: customer-support-service
+    build:
+      context: ./CustomerSupportService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5003:5003" # Map the container port to the host port
+    environment:
+      MONGO_URI: "mongodb://customer-service-db:27019/customer-service-db" # Use the service name as the hostname
+    volumes:
+      - ./CustomerSupportService/Service:/app # Mount the local directory to the container
+    depends_on:
+      - customer-service-db # Wait for the mongo service to be ready
+
+  customer-service-db:
+    container_name: customer-service-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - customer-service-db:/data/db # Persist the data locally
+      - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27019:27017" # Map the container port to the host port
+
 
 volumes:
   car-catalog-db:
     driver: local # Use the local volume driver
   authorization-db:
     driver: local # Use the local volume driver
+  customer-service-db:
+    driver: local
 
 networks:
   micro-net:
