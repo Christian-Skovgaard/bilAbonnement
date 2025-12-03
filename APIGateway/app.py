@@ -9,10 +9,12 @@ app = Flask(__name__)
 
 services = {
     "car-catalog-service": "http://car-catalog-service:5002",
+    "customer-support-service": "http://customer-support-service:5003/",
     "authorization-service": "http://authorization-service:5004"
 }
 
 CAR_CATALOG_SERVICE = "http://car-catalog-service:5002" # føles som noget som burde være i .env, specielt når det er med stort
+CUSTOMER_SERVICE = "http://customer-support-service:5003/"
 AUTHORIZATION_SERVICE = "http://authorization-service:5004" # "http://authorization-service:5004"
 
 def getJWTPublicKey():
