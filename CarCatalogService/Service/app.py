@@ -1,4 +1,46 @@
 from flask import Flask, jsonify, request
+import pymongo
+
+myclient = pymongo.MongoClient("mongodb://car-catalog-db:27017")
+mydb = myclient["car-catalog-db"] # Choose database "car-catalog-db"
+mycol = mydb["cars"] # Choose collection
+
+app = Flask(__name__)
+
+# Get all cars
+@app.route('/cars', methods=['GET'])
+def get_cars():
+    cursor = mycol.find({}, {"_id": 0}) # Query and remove MongoDB _id (surpress_id)
+    cars = list(cursor)
+    return jsonify(cars)
+
+# Get queried cars
+@app.route('/cars/query', methods=['GET']) # Skal kunne tage højde for, om pris er INDEN FOR monthlyMin og monthlyMax
+def search_cars():
+    queryParams = request.args # Dict of query parameters
+    query = []
+
+    for key, value in queryParams.items():
+        if value != "":
+            query.append({key: value}) # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
+
+    if query:
+        mongo_filter = {"$and": query} # Request parameters given.
+    else:
+        mongo_filter = {}  # No request parameters given / empty request parameters like: ?brand=&model=
+
+    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
+    cars = list(cursor)
+    return jsonify(cars)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5002)
+
+
+
+'''
+from flask import Flask, jsonify, request
 from mongoengine import connect, Document, StringField, IntField
 
 # adjust DB name if needed — your init script used "car-catalog-db"
@@ -66,6 +108,7 @@ def search_cars():
     # Query database
     cars = Car.objects(**filters)
     return jsonify([car_to_dict(c) for c in cars])
+    return jsonify("Hi :3")
 
 #Change car details by stelNR
 @app.route('/cars/stelnr/<stelNR>', methods=['PUT'])
@@ -85,3 +128,4 @@ def update_car(stelNR):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
+'''
