@@ -21,7 +21,7 @@ with open(os.path.join(script_dir, "keys/public_key.pem"), "r") as f:
 app.config["JWT_ALGORITHM"] = "RS256"
 app.config["JWT_PRIVATE_KEY"] = PRIVATE_KEY
 app.config["JWT_PUBLIC_KEY"] = PUBLIC_KEY
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=30)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=2) # OBS!!! Ændret til 2 minutter for testing.
 
 jwt = JWTManager(app)
 
