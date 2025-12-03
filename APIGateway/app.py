@@ -100,7 +100,7 @@ def lyskryds(service, path):
 
 # Account Service routes
 @app.route('/cars', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def getAllCars():
     #auth_header = request.headers.get('Authorization')
     #headers = {'Authorization': auth_header} if auth_header else {}
@@ -109,7 +109,7 @@ def getAllCars():
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars/query', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def queryCars():
     params = request.args.to_dict()
     response = requests.get(f"{CAR_CATALOG_SERVICE}/cars/query", params=params)
@@ -132,7 +132,7 @@ def getCarByStelNR(stelNR):
 
 
 @app.route('/complaints', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def getAllComplaints():
 
     # response = requests.get("http://customer-support-service:5003/complaints")
