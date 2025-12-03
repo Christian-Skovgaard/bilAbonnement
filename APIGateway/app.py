@@ -132,10 +132,11 @@ def getCarByStelNR(stelNR):
 
 
 @app.route('/complaints', methods=['GET'])
+@jwt_required()
 def getAllComplaints():
-    #auth_header = request.headers.get('Authorization')
-    #headers = {'Authorization': auth_header} if auth_header else {}
-    #response = requests.get(f"{ACCOUNT_SERVICE_URL}/profile", headers=headers)
+
+    # response = requests.get("http://customer-support-service:5003/complaints")
+
     response = requests.get(f"{CUSTOMER_SERVICE}/complaints")
     return jsonify(response.json()), response.status_code
 

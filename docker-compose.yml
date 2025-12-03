@@ -88,6 +88,8 @@ services:
       - ./CustomerSupportService/Service:/app # Mount the local directory to the container
     depends_on:
       - customer-service-db # Wait for the mongo service to be ready
+    networks:
+      - micro-net  
 
   customer-service-db:
     container_name: customer-service-db
@@ -97,6 +99,8 @@ services:
       - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
     ports:
       - "27019:27017" # Map the container port to the host port
+    networks:
+      - micro-net      
 
 
 volumes:
