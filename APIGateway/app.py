@@ -76,7 +76,7 @@ def test():
 
 
 @app.route('/<service>/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
-@jwt_required()
+@jwt_required(optional=True)
 def lyskryds(service, path):
 
     url = f"{services[service]}/{path}"
@@ -116,14 +116,14 @@ def queryCars():
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars', methods=['POST'])
-@jwt_required()
+@jwt_required(optional=True)
 def addCar():
     data = request.get_json(force=True)
     response = requests.post(f"{CAR_CATALOG_SERVICE}/cars", json=data)
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars/stelnr/<stelNR>', methods=['PUT'])
-@jwt_required()
+@jwt_required(optional=True)
 def getCarByStelNR(stelNR):
     data = request.get_json(force=True)
     response = requests.put(f"{CAR_CATALOG_SERVICE}/cars/stelnr/{stelNR}", json=data)
@@ -132,7 +132,7 @@ def getCarByStelNR(stelNR):
 
 
 @app.route('/complaints', methods=['GET'])
-#@jwt_required()
+@jwt_required(optional=True)
 def getAllComplaints():
 
     # response = requests.get("http://customer-support-service:5003/complaints")
