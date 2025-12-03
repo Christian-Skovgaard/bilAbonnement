@@ -106,18 +106,21 @@ def getAllCars():
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars/query', methods=['GET'])
+@jwt_required()
 def queryCars():
     params = request.args.to_dict()
     response = requests.get(f"{CAR_CATALOG_SERVICE}/cars/query", params=params)
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars', methods=['POST'])
+@jwt_required()
 def addCar():
     data = request.get_json(force=True)
     response = requests.post(f"{CAR_CATALOG_SERVICE}/cars", json=data)
     return jsonify(response.json()), response.status_code
 
 @app.route('/cars/stelnr/<stelNR>', methods=['PUT'])
+@jwt_required()
 def getCarByStelNR(stelNR):
     data = request.get_json(force=True)
     response = requests.put(f"{CAR_CATALOG_SERVICE}/cars/stelnr/{stelNR}", json=data)
