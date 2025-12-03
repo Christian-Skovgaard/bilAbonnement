@@ -42,9 +42,9 @@ with col1:
 with col2:
     st.subheader("Hej Victor!")
     if st.button(label="Log ud"):
-        if "Authorization" in controller.getAll(): # KUN RELEVANT FOR TESTING OG BUG FIXING
+        if "Authorization" in controller.getAll():
             controller.remove("Authorization")
-        if "JWT" in controller.getAll(): # KUN RELEVANT FOR TESTING OG BUG FIXING
+        if "JWT" in controller.getAll():
             controller.remove("JWT")
         st.switch_page("login.py")
 
