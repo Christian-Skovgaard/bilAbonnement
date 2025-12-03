@@ -82,11 +82,6 @@ with carLeft:
             st.write("Can't connect :(")
         else:
             st.dataframe(dataframe, hide_index=True)
-
-        # Boilerplate / easter egg
-        if "regNr" in st.query_params:
-            if(st.query_params["regNr"] == "XD"):
-                st.write("You're so fcking funny bro XD")
         
 
 with carRight:
