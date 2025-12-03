@@ -1,10 +1,12 @@
 import streamlit as st
+from streamlit_cookies_controller import CookieController
 import pandas as pd
 import requests
 
 # Data
 cars = []
 
+controller = CookieController()
 
 # Logik
 def queryParamsToString():
@@ -18,22 +20,22 @@ def queryParamsToString():
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}")
-        print(f"Query request: {st.query_params.items()}")
-        print(queryParamsToString())
+        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/cars")
-        print("get all request")
+        response = requests.get("http://localhost:5001/cars", headers={"Authorization": controller.get("Authorization")})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
-    canConnect = False
-    dataframe = []
+        st.switch_page("login.py")
+        canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
+        dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
 # Streamlit
 
 st.set_page_config(page_title="Oversigt | Bilabonnement", page_icon="⏱️", layout="wide")
+
+st.write(controller.getAll())
 
 col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
@@ -42,7 +44,11 @@ with col1:
 with col2:
     st.subheader("Hej Victor!")
     if st.button(label="Log ud"):
-        st.switch_page("login.py") # Manglende funktionalitet (Fjern JWT i cookies)
+        if "Authorization" in controller.getAll(): # KUN RELEVANT FOR TESTING OG BUG FIXING
+            controller.remove("Authorization")
+        if "JWT" in controller.getAll(): # KUN RELEVANT FOR TESTING OG BUG FIXING
+            controller.remove("JWT")
+        st.switch_page("login.py")
 
 with st.container(border=True):
     carsPageBtn, damageRegiBtn, dealershipBtn, subscriptionsBtn, customerSuppBtn = st.columns(5)
