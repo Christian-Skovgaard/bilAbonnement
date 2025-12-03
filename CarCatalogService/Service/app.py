@@ -24,17 +24,21 @@ def get_cars():
     return jsonify(cars)
 
 # Get queried cars
-@app.route('/cars/query', methods=['GET'])
+@app.route('/cars/query', methods=['GET']) # Skal kunne tage højde for, om pris er INDEN FOR monthlyMin og monthlyMax
 def search_cars():
     queryParams = request.args # Dict of query parameters
     query = []
+
     for key, value in queryParams.items():
         if value != "":
             query.append({key: value}) # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
 
-    cursor = mycol.find({
-       "$and": query
-    }, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
+    if query:
+        mongo_filter = {"$and": query} # Request parameters given.
+    else:
+        mongo_filter = {}  # No request parameters given / empty request parameters like: ?brand=&model=
+
+    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
     cars = list(cursor)
     return jsonify(cars)
 

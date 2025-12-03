@@ -8,20 +8,28 @@ cars = []
 
 # Logik
 def queryParamsToString():
-    queryString = "?"
-    for key, value in st.query_params.items():
-        queryString += f"{key}={value}&"
-    return queryString[0:len(queryString)-1] # Remove the last "&".
+    if len(st.query_params.items()) != 0:
+        queryString = ""
+        for key, value in st.query_params.items():
+            queryString += f"{key}={value}&"
+        return queryString[0:len(queryString)-1] # Return query string and remove the last "&".
+    else:
+        return ""
 
 try:
-    response = requests.get('http://localhost:5001/cars')
+    if len(st.query_params.items()) != 0: # Hvis der er query parameters
+        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}")
+        print(f"Query request: {st.query_params.items()}")
+        print(queryParamsToString())
+    else: # Hvis der ikke er query parameters
+        response = requests.get("http://localhost:5001/cars")
+        print("get all request")
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
     canConnect = False
     dataframe = []
-
 
 # Streamlit
 
@@ -41,6 +49,7 @@ with st.container(border=True):
     with carsPageBtn:
         if st.button(label="Biler", type="primary"):
             st.query_params = {}
+            st.rerun()
 
     with damageRegiBtn:
         st.button(label="Skader")
@@ -90,24 +99,25 @@ with carRight:
         maxPrice = 12000
         monthlyPrice = st.slider(label="Månedlig pris", min_value=minPrice, max_value=maxPrice, value=(minPrice, maxPrice), step=500)
 
-        if st.button(label="Anvend"):
-            st.query_params["regNr"] = regNr
-            st.query_params["brand"] = brand
-            st.query_params["model"] = model
-            if modelYear == None:
-                st.query_params["modelYear"] = "" # Hvis "None" sæt til tom string.
-            else:
-                st.query_params["modelYear"] = modelYear
-            if propellant == "Alle":
-                st.query_params["propellant"] = "" # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
-            else:
-                st.query_params["propellant"] = propellant
-            st.query_params["kmDriven"] = kmDriven
-            st.query_params["monthlyMin"] = monthlyPrice[0] # min
-            st.query_params["monthlyMax"] = monthlyPrice[1] # max
-            st.rerun()
-        
-        if st.button(label="test"):
-            for key, value in st.query_params.items() :
-                print (key, value)
-            print(len(st.query_params), queryParamsToString())
+        anvendBtn, nulstilBtn = st.columns(2)
+        with anvendBtn:
+            if st.button(label="Anvend"):
+                st.query_params["regNr"] = regNr
+                st.query_params["brand"] = brand
+                st.query_params["model"] = model
+                if modelYear == None:
+                    st.query_params["modelYear"] = "" # Hvis "None" sæt til tom string.
+                else:
+                    st.query_params["modelYear"] = modelYear
+                if propellant == "Alle":
+                    st.query_params["propellant"] = "" # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
+                else:
+                    st.query_params["propellant"] = propellant
+                #st.query_params["kmDriven"] = kmDriven
+                #st.query_params["monthlyMin"] = monthlyPrice[0] # min
+                #st.query_params["monthlyMax"] = monthlyPrice[1] # max
+                st.rerun()
+        with nulstilBtn:
+            if st.button(label="Nulstil"):
+                st.query_params = {}
+                st.rerun()
