@@ -7,8 +7,6 @@ controller = CookieController()
 
 st.set_page_config(page_title="Oversigt | Bilabonnement", page_icon="⏱️", layout="wide")
 
-st.write(controller.getAll())
-
 col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
