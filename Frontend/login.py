@@ -7,7 +7,12 @@ with st.container(border=True):
 
     st.subheader("Log ind")
 
-    st.text_input(label="Brugernavn")
-    st.text_input(label="Password")
+    username = st.text_input(label="Brugernavn")
+    password = st.text_input(label="Password", type="password")
 
-    st.button(label="Log ind")
+    st.write(str(username))
+
+    st.html(f'''
+            <form action="./cars">
+                <input type="submit" value="Log ind"/>
+            </form>''')
