@@ -78,7 +78,18 @@ def add_car():
     data['_id'] = str(cursor.inserted_id)
     return jsonify(data), 201
 
-
+# Change car details by regNr
+@app.route('/cars/regNr/<regNr>', methods=['PUT'])
+def update_car(regNr):
+    trimmedRegNr = regNr.strip(" ")  # Remove leading/trailing spaces
+    data = request.get_json(force=True)
+    car = mycol.find_one({"regNr": trimmedRegNr})
+    if not car:
+        return jsonify({"error": "Car not found"}), 404
+    
+    mycol.update_one({"regNr": trimmedRegNr}, {"$set": data})
+    updated_car = mycol.find_one({"regNr": trimmedRegNr}, {"_id": 0})
+    return jsonify(updated_car)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)

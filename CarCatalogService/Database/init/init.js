@@ -56,7 +56,7 @@ db.createCollection("cars", {
 // Insert sample documents
 db.cars.insertMany([
   {
-    regNr: "XD 69 420",
+    regNr: "XD69420",
     brand: "Toyota",
     model: "GT86",
     modelYear: 2012,
@@ -66,7 +66,7 @@ db.cars.insertMany([
     available: true
   },
   {
-    regNr: "JD 97 731",
+    regNr: "JD97731",
     brand: "Chevrolet",
     model: "Suburban",
     modelYear: 2006,
@@ -76,7 +76,7 @@ db.cars.insertMany([
     available: true
   },
   {
-    regNr: "BQ 38 126",
+    regNr: "BQ38126",
     brand: "Audi",
     model: "A6",
     modelYear: 2008,
@@ -86,7 +86,7 @@ db.cars.insertMany([
     available: true
   },
   {
-    regNr: "DO 17 851",
+    regNr: "DO17851",
     brand: "BMW",
     model: "X1",
     modelYear: 2019,
@@ -96,7 +96,7 @@ db.cars.insertMany([
     available: false
   },
   {
-    regNr: "AD 46 784",
+    regNr: "AD46784",
     brand: "Citroen",
     model: "Berlingo",
     modelYear: 2008,
@@ -106,7 +106,7 @@ db.cars.insertMany([
     available: true
   },
   {
-    regNr: "UG 23 317",
+    regNr: "UG23317",
     brand: "Hyundai",
     model: "Kona",
     modelYear: 2022,
@@ -116,7 +116,7 @@ db.cars.insertMany([
     available: true
   },
   {
-    regNr: "TP 68 117",
+    regNr: "TP68117",
     brand: "Kia",
     model: "Niro",
     modelYear: 2019,
