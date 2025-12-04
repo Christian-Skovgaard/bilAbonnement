@@ -15,12 +15,12 @@ def insertSubscription (subObj): #works
         result = mycol.insert_one(subObj)
         print(f"Subscription inserted with _id: {result.inserted_id}")
         return {
-            "succes": True,
+            "success": True,
             "id": str(result.inserted_id)
             }
     except:
         print("failed to put stuff in the box")
-        return {"succes": False}
+        return {"success": False}
    
 
 def updateSubscriptionOnId(sub_id, update_fields):

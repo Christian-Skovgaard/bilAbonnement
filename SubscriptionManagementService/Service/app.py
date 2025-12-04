@@ -29,18 +29,23 @@ def createSubscription():
 
     today = datetime.date.today()
 
+    subObj["associatedRegNr"] = subObj["associatedRegNr"].strip(" ") # trimmer for od orden
     subObj["orderDate"] = today.strftime("%Y-%m-%d"), # laver datetime om til str
     subObj["active"] = False
 
     insertObj = db.insertSubscription(subObj)
 
-    if not insertObj["succes"]: # hvis ikke det er succes at indsætte i db, måske lidt redudant, men du ved...
+
+    print(insertObj)
+    if not insertObj["success"]: # hvis ikke det er succes at indsætte i db, måske lidt redudant, men du ved...
         return jsonify({"msg": "internal server error when inserting subObj to db"}), 500
     
     subObj["id"] = insertObj["id"]
 
+    print("today", today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date())
     if today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
-        tasks.onSubscriptionStart(subObj)    # i så fald kører de tasks som skal kører ved subscription start
+        subStartResp = tasks.onSubscriptionStart(subObj)    # i så fald kører de tasks som skal kører ved subscription start
+        print(subStartResp)
 
     return jsonify({"msg": f"succesfully inserted sub with id: {subObj["id"]}"})
 
