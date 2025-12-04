@@ -38,6 +38,10 @@ def getAuthHeader():
         json=authCredz
     )
 
+    
+
+    returnHeader = {"Authorization": }
+
     return response.json()
 
 print(getAuthHeader())
