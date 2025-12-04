@@ -7,7 +7,10 @@ import os
 services = {
     "car-catalog-service": "http://car-catalog-service:5002",
     "customer-support-service": "http://customer-support-service:5003/",
-    "authorization-service": "http://authorization-service:5004"
+    "authorization-service": "http://authorization-service:5004",
+    "customer-managment-service": "temp:5005",
+    "subscription-managment-service": "temp:5006",
+    "payment-service": "temp:5007",
 }
 
 app = Flask(__name__)
@@ -30,10 +33,8 @@ def getAuthToken():
         method="POST",
         url=url,
         headers=dict(request.headers),
-        data=request.get_data() # body hedder i flask data
+        data=request.get_data() # body hedder data i flask
     )
-
-    data = response.json()
 
     return response.content
 
