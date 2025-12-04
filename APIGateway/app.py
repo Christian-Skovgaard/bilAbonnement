@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify, Response
 import requests
 from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity, get_jwt)
 import os
+from celery import Celery
+import time
+from tasks import *
 
 # Service URLs (internal Docker network)
 services = {
@@ -24,6 +27,29 @@ PUBLIC_KEY = resp.json()["key"]
 app.config["JWT_ALGORITHM"] = "RS256" # asymetrisk algoritme som kan valideres af public men kun krypteres af private
 app.config["JWT_PUBLIC_KEY"] = PUBLIC_KEY # public key kan bruges til at validere tokens, den får vi fra AuthorizationService
 
+@app.route('/start-job', methods=['POST'])
+def start_job():
+    data = request.json
+    
+    # .delay() is the magic. It serializes the data and sends it 
+    # to RabbitMQ. It does NOT wait for the function to finish.
+    task = process_heavy_data.delay(data)
+    
+    return jsonify({
+        "message": "Job accepted",
+        "task_id": task.id,
+        "status": "queued"
+    }), 202
+
+@app.route('/cars', methods=["GET"])
+def get_cars():
+    task = getCars.delay(request.data)
+    
+    return jsonify({
+        "message": "Job accepted",
+        "task_id": task.id,
+        "status": "queued"
+    }), 202
 
 @app.route('/getAuthToken', methods=['POST'])
 @jwt_required(optional=True)
@@ -72,7 +98,7 @@ def lyskryds(service, path):
         )
 
     return clientResponse
-    
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
