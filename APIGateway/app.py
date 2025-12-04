@@ -62,7 +62,7 @@ def lyskryds(service, path):
         url=url,
         headers=dict(request.headers), # vi omformaterer fordi req-headersne har formatet flak-header, men headers argumentet forventer dict
         params=request.args,
-        json=request.get_json(silent=True),
+        json=request.get_json(),
     )
 
     clientResponse = Response(
