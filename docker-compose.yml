@@ -123,7 +123,7 @@ services:
     image: mongo:latest # Use the latest MongoDB image
     volumes:
       - subscription-management-db:/data/db # Persist the data locally
-      - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
+      - ./SubscriptionManagementService/Database/init:/docker-entrypoint-initdb.d
     ports:
       - "27021:27017" # Map the container port to the host port
     networks:

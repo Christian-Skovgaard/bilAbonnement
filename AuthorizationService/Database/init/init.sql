@@ -13,5 +13,5 @@ CREATE TABLE users (
 
 INSERT INTO users (username, password, role, department) VALUES
 ('Bo', 'Elefant', 'admin', 'Koling'),
-('AndersElten42', 'chalklin', 'user', 'København')
-('custommerManagementService','Ugenkendlig Thai-ret','application')
+('AndersElten42', 'chalklin', 'user', 'København'),
+('custommerManagementService','Ugenkendlig Thai-ret','application',NULL)
