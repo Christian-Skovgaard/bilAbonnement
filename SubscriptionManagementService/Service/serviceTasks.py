@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 def onSubscriptionStart ():
-    authHeader = getAuthHeader()
+    # authHeader = getAuthHeader()
     
     # skrive og resaverer bilen
     # opdatere aktiv status i db

@@ -5,8 +5,8 @@
     "endDate": "",
     "active": false,
     "pickupLocation": "",
-    "associatedUserId": "",
-    "regNr": "",
+    "associatedCustommerId": "",
+    "associatedRegNr": "",
     "pricePrMonth": "",
-    "forsikringsNr": ""
+    "insuranceDealNr": 1
 }

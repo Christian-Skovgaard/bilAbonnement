@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request
+import dbUtil as db
+import serviceTasks as tasks
 import pymongo
+import datetime
 
 myclient = pymongo.MongoClient("mongodb://subscription-management-db:27017")
 mydb = myclient["subscription-db"] # Choose database "car-catalog-db"
@@ -9,9 +12,51 @@ app = Flask(__name__)
 
 @app.post('/createSubscription')
 def createSubscription():
-    None
+
+    subObj = request.get_json()
+
+    required = {
+        "startDate",    # skal være str i format yyyy-mm-dd
+        "endDate",
+        "pickupLocation",
+        "associatedCustommerId",
+        "associatedRegNr",
+        "pricePrMonth"
+    }
+
+    if not required.issubset(subObj):  #vi tjekker om alle keys er der
+        return jsonify({"error": "Missing fields 🏺🌎🚑"}), 400
+
+    today = datetime.date.today()
+
+    subObj["orderDate"] = today.strftime("%Y-%m-%d"), # laver datetime om til str
+    subObj["active"] = False
+
+    insertObj = db.insertSubscription(subObj)
+
+    if not insertObj["succes"]: # hvis ikke det er succes at indsætte i db, måske lidt redudant, men du ved...
+        return jsonify({"msg": "internal server error when inserting subObj to db"}), 500
+    
+    subObj["id"] = insertObj["id"]
+
+    if today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
+        tasks.onSubscriptionStart(subObj)    # i så fald kører de tasks som skal kører ved subscription start
+
+    return jsonify({"msg": f"succesfully inserted sub with id: {subObj["id"]}"})
 
 
+@app.route('/dostuff', methods=['GET'])
+def stuff():
+
+    data = {
+        "yes": "baby"
+    }
+
+    resp = db.insertSubscription(data)
+
+    print(resp)
+
+    return jsonify("ok")
 
 
 @app.route('/test', methods=['GET'])

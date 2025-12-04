@@ -1,0 +1,2 @@
+# kæmpe problem!!!!!
+**Nu tager service ikke højde for kommende lejning af biler for det er der ikke et skema over, så man kan komme ud for at der ikke er flere biler tilbage af dem man gerne vil have når ens abonnetment starter hvis det altså ikke starter i dag**
