@@ -26,18 +26,21 @@ def hasEmpty(list):
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
-    if "Authorization" in controller.getAll():
-        controller.remove("Authorization")
-    if "JWT" in controller.getAll():
-        controller.remove("JWT")
-    st.switch_page("login.py")
+    #if "Authorization" in controller.getAll():
+        #controller.remove("Authorization")
+    #if "JWT" in controller.getAll():
+        #controller.remove("JWT")
+    #st.switch_page("login.py")
+    response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
+    st.write(controller.getAll())
+    st.write(response.status_code)
     canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
     dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
