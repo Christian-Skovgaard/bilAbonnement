@@ -33,14 +33,11 @@ try:
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
-    #if "Authorization" in controller.getAll():
-        #controller.remove("Authorization")
-    #if "JWT" in controller.getAll():
-        #controller.remove("JWT")
-    #st.switch_page("login.py")
-    response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
-    st.write(controller.getAll())
-    st.write(response.status_code)
+    if "Authorization" in controller.getAll():
+        controller.remove("Authorization")
+    if "JWT" in controller.getAll():
+        controller.remove("JWT")
+    st.switch_page("login.py")
     canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
     dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 

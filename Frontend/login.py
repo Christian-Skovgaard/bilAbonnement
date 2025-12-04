@@ -13,8 +13,6 @@ with st.container(border=True):
 
     username = st.text_input(label="Brugernavn")
     password = st.text_input(label="Password", type="password")
-
-    st.write(controller.getAll())
     
     if st.button(label="Log ind"):
         response = requests.post("http://localhost:5001/getAuthToken", json={"username": username, "password": password})
