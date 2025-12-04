@@ -10,7 +10,8 @@ services = {
     "authorization-service": "http://authorization-service:5004",
     "customer-managment-service": "temp:5005",
     "subscription-managment-service": "temp:5006",
-    "payment-service": "temp:5007"
+    "payment-service": "temp:5007",
+    "subscription-management-service": "http://subscription-management-service:5008"
 }
 
 app = Flask(__name__)
@@ -61,7 +62,7 @@ def lyskryds(service, path):
         url=url,
         headers=dict(request.headers), # vi omformaterer fordi req-headersne har formatet flak-header, men headers argumentet forventer dict
         params=request.args,
-        data=request.get_data(),
+        json=request.get_json(),
     )
 
     clientResponse = Response(
