@@ -108,7 +108,7 @@ services:
       context: ./SubscriptionManagementService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
     ports:
-      - "5003:5003" # Map the container port to the host port
+      - "5008:5008" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://subscription-management-db:27017/subscriptionDB" # Use the service name as the hostname
     volumes:
@@ -125,7 +125,7 @@ services:
       - subscription-management-db:/data/db # Persist the data locally
       - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
     ports:
-      - "27020:27017" # Map the container port to the host port
+      - "27021:27017" # Map the container port to the host port
     networks:
       - micro-net
 
@@ -136,6 +136,8 @@ volumes:
   authorization-db:
     driver: local # Use the local volume driver
   customer-service-db:
+    driver: local
+  subscription-management-db:
     driver: local
 
 networks:
