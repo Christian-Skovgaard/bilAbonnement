@@ -1,4 +1,8 @@
 import streamlit as st
+from streamlit_cookies_controller import CookieController
+import requests
+
+controller = CookieController()
 
 st.set_page_config(page_title="Log ind | Bilabonnement", page_icon="⏱️", layout="centered")
 
@@ -11,8 +15,14 @@ with st.container(border=True):
     password = st.text_input(label="Password", type="password")
 
     st.write(str(username))
-
-    st.html(f'''
-            <form action="./cars">
-                <input type="submit" value="Log ind"/>
-            </form>''')
+    
+    if st.button(label="Log ind"):
+        st.write(f"{username}, {password}")
+        response = requests.post("http://localhost:5001/getAuthToken", json={"username": username, "password": password})
+        
+        if "access_token" in response.json():
+            controller.set("Authorization", f"Bearer {response.json()["access_token"]}")
+            st.switch_page("pages/cars.py")
+        else:
+            st.write(f":red[{response.json()["error"]}]")
+        

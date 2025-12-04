@@ -1,10 +1,12 @@
 import streamlit as st
+from streamlit_cookies_controller import CookieController
 import pandas as pd
 import requests
 
 # Data
 cars = []
 
+controller = CookieController()
 
 # Logik
 def queryParamsToString():
@@ -18,18 +20,16 @@ def queryParamsToString():
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}")
-        print(f"Query request: {st.query_params.items()}")
-        print(queryParamsToString())
+        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/cars")
-        print("get all request")
+        response = requests.get("http://localhost:5001/cars", headers={"Authorization": controller.get("Authorization")})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
-    canConnect = False
-    dataframe = []
+    st.switch_page("login.py")
+    canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
+    dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
 # Streamlit
 
@@ -42,7 +42,11 @@ with col1:
 with col2:
     st.subheader("Hej Victor!")
     if st.button(label="Log ud"):
-        st.switch_page("login.py") # Manglende funktionalitet (Fjern JWT i cookies)
+        if "Authorization" in controller.getAll():
+            controller.remove("Authorization")
+        if "JWT" in controller.getAll():
+            controller.remove("JWT")
+        st.switch_page("login.py")
 
 with st.container(border=True):
     carsPageBtn, damageRegiBtn, dealershipBtn, subscriptionsBtn, customerSuppBtn = st.columns(5)
@@ -52,16 +56,20 @@ with st.container(border=True):
             st.rerun()
 
     with damageRegiBtn:
-        st.button(label="Skader")
+        if st.button(label="Skader"):
+            st.switch_page("pages/damages.py")
 
     with dealershipBtn:
-        st.button(label="Forhandler")
+        if st.button(label="Forhandler"):
+            st.switch_page("pages/dealership.py")
 
     with subscriptionsBtn:
-        st.button(label="Abonnementer")
+        if st.button(label="Abonnementer"):
+            st.switch_page("pages/subscriptions.py")
 
     with customerSuppBtn:
-        st.button(label="Kundeservice")
+        if st.button(label="Kundeservice"):
+            st.switch_page("pages/customersupport.py")
 
 carLeft, carRight = st.columns([6,4])
 with carLeft:
@@ -72,11 +80,6 @@ with carLeft:
             st.write("Can't connect :(")
         else:
             st.dataframe(dataframe, hide_index=True)
-
-        # Boilerplate / easter egg
-        if "regNr" in st.query_params:
-            if(st.query_params["regNr"] == "XD"):
-                st.write("You're so fcking funny bro XD")
         
 
 with carRight:
