@@ -1,8 +1,57 @@
 // Switch to your database
+// Switch to your database
 db = db.getSiblingDB("car-catalog-db");
 
-// Create a collection
-db.createCollection("cars");
+// Car JSON schema validation
+db.createCollection("cars", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["regNr", "brand", "model", "modelYear", "propellant", "kmDriven", "monthlyPrice", "available"],
+      properties: {
+        regNr: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        brand: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        model: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        modelYear: {
+          bsonType: "int",
+          minimum: 1886, // first car invented
+          maximum: 2100,
+          description: "must be an integer year"
+        },
+        propellant: {
+          bsonType: "string",
+          enum: ["Benzin", "Diesel", "El", "Hybrid"],
+          description: "must be one of the allowed fuel types"
+        },
+        kmDriven: {
+          bsonType: "int",
+          minimum: 0,
+          description: "must be a non-negative integer"
+        },
+        monthlyPrice: {
+          bsonType: "int",
+          minimum: 0,
+          description: "must be a non-negative integer"
+        },
+        available: {
+          bsonType: "bool",
+          description: "must be true or false"
+        }
+      }
+    }
+  },
+  validationAction: "error" // reject invalid inserts/updates
+});
+
 
 // Insert sample documents
 db.cars.insertMany([
