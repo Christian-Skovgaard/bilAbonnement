@@ -13,11 +13,8 @@ with st.container(border=True):
 
     username = st.text_input(label="Brugernavn")
     password = st.text_input(label="Password", type="password")
-
-    st.write(str(username))
     
     if st.button(label="Log ind"):
-        st.write(f"{username}, {password}")
         response = requests.post("http://localhost:5001/getAuthToken", json={"username": username, "password": password})
         
         if "access_token" in response.json():
@@ -25,4 +22,3 @@ with st.container(border=True):
             st.switch_page("pages/cars.py")
         else:
             st.write(f":red[{response.json()["error"]}]")
-        
