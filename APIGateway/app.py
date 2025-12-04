@@ -49,7 +49,7 @@ def test():
 
 
 @app.route('/<service>/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
-@jwt_required(optional=True)
+@jwt_required()
 def lyskryds(service, path):
 
     if not service in services:
@@ -72,7 +72,11 @@ def lyskryds(service, path):
         )
 
     return clientResponse
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 0dafce4d1e6bb6603cb729e913abd51449ebd483
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
