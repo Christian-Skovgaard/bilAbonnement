@@ -35,9 +35,9 @@ def getAuthHeader():
         method="POST",
         url=url,
         headers={"Content-Type": "application/json"},
-        data=authCredz
+        json=authCredz
     )
 
-    return response
+    return response.json()
 
 print(getAuthHeader())
