@@ -8,12 +8,14 @@ cars = []
 
 controller = CookieController()
 
+
 # Logik
 def queryParamsToString():
     if len(st.query_params.items()) != 0:
         queryString = ""
         for key, value in st.query_params.items():
-            queryString += f"{key}={value}&"
+            if value != None or value != "" or value != null:
+                queryString += f"{key}={value}&"
         return queryString[0:len(queryString)-1] # Return query string and remove the last "&".
     else:
         return ""
@@ -24,11 +26,18 @@ def hasEmpty(list):
             return True
     return False
 
+def updateQueryParams(input, parameter):
+    if (input == "") or (input == None):
+        if parameter in st.query_params:
+            st.query_params.pop(parameter) # Fjern fra query parameters, hvis indholdet er opdateret til en tom værdi.
+    else:
+        st.query_params[parameter] = input
+
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
@@ -41,8 +50,8 @@ except:
     canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
     dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
-# Streamlit
 
+# Streamlit
 st.set_page_config(page_title="Oversigt | Bilabonnement", page_icon="⏱️", layout="wide")
 
 col1, col2 = st.columns([5,1], vertical_alignment="center")
@@ -114,24 +123,30 @@ with carRight:
             minPrice = 2000 # Kan finde min og max månedlig pris fra database
             maxPrice = 12000
             filterMonthlyPrice = st.slider(label="Månedlig pris", min_value=minPrice, max_value=maxPrice, value=(minPrice, maxPrice), step=500, key="filterMonthlyPrice")
+            filterAvailable = st.checkbox(label="Tilgængelig", key="filterAvailable")
 
             anvendBtn, nulstilBtn = st.columns(2)
             with anvendBtn:
                 if st.button(label="Anvend"):
-                    st.query_params["regNr"] = filterRegNr
-                    st.query_params["brand"] = filterBrand
-                    st.query_params["model"] = filterModel
-                    if filterModelYear == None:
-                        st.query_params["modelYear"] = "" # Hvis "None" sæt til tom string.
-                    else:
-                        st.query_params["modelYear"] = filterModelYear
+                    updateQueryParams(filterRegNr, "regNr")
+                    updateQueryParams(filterBrand, "brand")
+                    updateQueryParams(filterModel, "model")
+                    updateQueryParams(filterModelYear, "modelYear")
+                    updateQueryParams(filterBrand, "brand")
+                    updateQueryParams(filterBrand, "brand")
+                    updateQueryParams(filterBrand, "brand")
                     if filterPropellant == "Alle":
-                        st.query_params["propellant"] = "" # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
+                        updateQueryParams("", "propellant") # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
                     else:
-                        st.query_params["propellant"] = filterPropellant
+                        updateQueryParams(filterPropellant, "propellant")
                     #st.query_params["maxKmDriven"] = filterMaxKmDriven
                     #st.query_params["monthlyMin"] = monthlyPrice[0] # min
                     #st.query_params["monthlyMax"] = monthlyPrice[1] # max
+                    if filterAvailable == False:
+                        updateQueryParams("", "available") # "False" skal ikke sendes med som en query parameter - det skal bare være tomt.
+                    else:
+                        updateQueryParams(filterPropellant, "available")
+                        st.query_params["available"] = filterAvailable
                     st.rerun()
             with nulstilBtn:
                 if st.button(label="Nulstil"):
@@ -156,21 +171,26 @@ with carRight:
             with priceCol:
                 addPrice = st.number_input(label="Månedlig pris", step=1, placeholder="Indtast pris", value=None)
             
+            addAvailable = st.checkbox(label="Tilgængelig", key="addAvailable", value=False)
+            
             if st.button(label="Tilføj"):
                 if hasEmpty([addRegNr, addBrand, addModel, addModelYear, addPropellant, addKmDriven, addPrice]): # Hvis et af felterne ikke er udfyldt.
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
-                    st.write("Send request :3") # POST request goes here
-                #    response = requests.post("http://localhost:5001/car-catalog-service/addCar", json={
-                #        "regNr": addRegNr,
-                #        "brand": addBrand,
-                #        "model": addModel,
-                #        "modelYear": addModelYear,
-                #        "propellant": addPropellant,
-                #       "price": addPrice
-                #    })
-                #   st.write("Bil oprettet")
-                #   st.rerun()
+                    try:
+                        response = requests.post("http://localhost:5001/car-catalog-service/cars", json={ # BUG: Bil bliver oprettet uden at trykke på knappen, hvis et felt opdateres efter fejlet forsøg.
+                            "regNr": addRegNr.replace(" ", ""),
+                            "brand": addBrand,
+                            "model": addModel,
+                            "modelYear": addModelYear,
+                            "propellant": addPropellant,
+                            "kmDriven": addKmDriven,
+                            "monthlyPrice": addPrice,
+                            "available": addAvailable
+                        }, headers={"Authorization": controller.get("Authorization")})
+                        st.rerun()
+                    except:
+                        st.write(f":red[Kunne ikke tilføje bil.]")
 
     with tab3:
         with st.container(border=True):
@@ -181,7 +201,7 @@ with carRight:
                     st.write(f":red[Indtast registreringsnummer]")
                 else:
                     try:
-                        updateResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={updateRegNr}", headers={"Authorization": controller.get("Authorization")})
+                        updateResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={updateRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
                     except:
                         if "Authorization" in controller.getAll():
                             controller.remove("Authorization")
@@ -218,7 +238,7 @@ with carRight:
                     st.write(f":red[Indtast registreringsnummer]")
                 else:
                     try:
-                        removalResponse = requests.get(f"http://localhost:5001/cars/query?regNr={removeRegNr}", headers={"Authorization": controller.get("Authorization")})
+                        removalResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={removeRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
                     except:
                         if "Authorization" in controller.getAll():
                             controller.remove("Authorization")
