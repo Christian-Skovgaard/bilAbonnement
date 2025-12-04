@@ -55,23 +55,5 @@ def getAuthToken():
 def getPublicKey ():
     return {"key": PUBLIC_KEY}
 
-
-@app.route("/admin", methods=["GET"])
-@jwt_required()
-def superSecretMicroService():
-    claims = get_jwt()
-    
-    return jsonify(claims)
-
-
-
-@app.route('/', methods=['GET'])
-def test():
-    return "hello there"
-
-@app.route('/test', methods=['GET'])
-def test2():
-    return "hello there"
-
 app.run(host='0.0.0.0', debug=True, port=5004)
 
