@@ -1,12 +1,13 @@
 import requests
 from flask import jsonify, request
 from dotenv import load_dotenv
+import datetime
 import os
 
 load_dotenv()
 
 def onSubscriptionStart ():
-    # get jwt
+    authHeader = getAuthHeader()
     
     # skrive og resavere bilen
     # opdatere aktiv status i db
@@ -15,6 +16,7 @@ def onSubscriptionStart ():
     None
 
 def onSubscriptionEnd ():
+    #jwt
     # skrive til payment
     # afresavere bilen
     # opdatere aktiv status i db
@@ -36,12 +38,12 @@ def getAuthHeader():
         url=url,
         headers={"Content-Type": "application/json"},
         json=authCredz
-    )
+    ).json()
 
-    
+    key = response["access_token"]
 
-    returnHeader = {"Authorization": }
+    returnHeader = {"Authorization": f"Bearer {key}"}
 
-    return response.json()
+    return returnHeader
 
 print(getAuthHeader())
