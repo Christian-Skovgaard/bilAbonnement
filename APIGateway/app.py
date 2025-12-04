@@ -42,16 +42,17 @@ def getAuthToken():
 
 #endpoint der hjælper med at teste om vi for svar
 @app.route('/heath', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def test():
-    auth = get_jwt()
-    headers = request.headers
     return jsonify(heath="tip top form 🏋️")
 
 
 @app.route('/<service>/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @jwt_required(optional=True)
 def lyskryds(service, path):
+
+    if not service in services:
+        return jsonify(msg="no service with that name")
 
     url = f"{services[service]}/{path}"
 
