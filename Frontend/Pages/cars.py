@@ -194,18 +194,18 @@ with carRight:
                     elif len(updateResponse.json()) > 1:
                         st.write(f":red[Flere biler fundet - specificer registreringsnummer]")
                     else:
-                        updateBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", value=response.json()[0]["brand"])
-                        updateModel = st.text_input(label="Model", placeholder="Indtast model", value=response.json()[0]["model"])
+                        updateBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", value=updateResponse.json()[0]["brand"])
+                        updateModel = st.text_input(label="Model", placeholder="Indtast model", value=updateResponse.json()[0]["model"])
                         updateCol1, updateCol2 = st.columns(2)
                         with updateCol1:
-                            updateModelYear = st.text_input(label="Årstal", placeholder="Indtast årstal", value=response.json()[0]["modelYear"])
+                            updateModelYear = st.text_input(label="Årstal", placeholder="Indtast årstal", value=updateResponse.json()[0]["modelYear"])
                         with updateCol2:
-                            updatePropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", value=response.json()[0]["propellant"])
+                            updatePropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", value=updateResponse.json()[0]["propellant"])
                         updateCol3, updateCol4 = st.columns(2)
                         with updateCol3:
-                            updateKmDriven = st.text_input(label="Km kørt", placeholder="Indtast km kørt", value=response.json()[0]["kmDriven"])
+                            updateKmDriven = st.text_input(label="Km kørt", placeholder="Indtast km kørt", value=updateResponse.json()[0]["kmDriven"])
                         with updateCol4:
-                            updatePrice = st.text_input(label="Månedlig pris", placeholder="Indtast pris", value=response.json()[0]["monthlyPrice"])
+                            updatePrice = st.text_input(label="Månedlig pris", placeholder="Indtast pris", value=updateResponse.json()[0]["monthlyPrice"])
                         if st.button(label="Opdater bil", type="primary"):
                             st.write("Ok :3") # PUT request goes here.
 
@@ -231,7 +231,18 @@ with carRight:
                     elif len(removalResponse.json()) > 1:
                         st.write(f":red[Flere biler fundet - specificer registreringsnummer]")
                     else:
-                        st.write(f"Du vil slette følgende bil, korrekt?")
-                        st.write(removalResponse.json())
+                        removalBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", value=removalResponse.json()[0]["brand"], disabled=True, key="removalBrand")
+                        removalModel = st.text_input(label="Model", placeholder="Indtast model", value=removalResponse.json()[0]["model"], disabled=True, key="removalModel")
+                        removalCol1, removalCol2 = st.columns(2)
+                        with removalCol1:
+                            removalModelYear = st.text_input(label="Årstal", placeholder="Indtast årstal", value=removalResponse.json()[0]["modelYear"], disabled=True, key="removalmodelYear")
+                        with removalCol2:
+                            removalPropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", value=removalResponse.json()[0]["propellant"], disabled=True, key="removalPropellant")
+                        removalCol3, removalCol4 = st.columns(2)
+                        with removalCol3:
+                            removalKmDriven = st.text_input(label="Km kørt", placeholder="Indtast km kørt", value=removalResponse.json()[0]["kmDriven"], disabled=True, key="removalKmDriven")
+                        with removalCol4:
+                            removalPrice = st.text_input(label="Månedlig pris", placeholder="Indtast pris", value=removalResponse.json()[0]["monthlyPrice"], disabled=True, key="removalPrice")
+                        st.write(f":red[Er du sikker på, at du vil slette denne bil?]")
                         if st.button(label="Slet bil", type="primary"):
                             st.write("Ok :3") # DELETE request goes here.
