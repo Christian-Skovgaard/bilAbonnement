@@ -8,7 +8,6 @@ cars = []
 
 controller = CookieController()
 
-
 # Logik
 def queryParamsToString():
     if len(st.query_params.items()) != 0:
@@ -33,22 +32,20 @@ def updateQueryParams(input, parameter):
     else:
         st.query_params[parameter] = input
 
+
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
-    canConnect = True
 except:
     if "Authorization" in controller.getAll():
         controller.remove("Authorization")
     if "JWT" in controller.getAll():
         controller.remove("JWT")
     st.switch_page("login.py")
-    canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
-    dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
 
 # Streamlit
@@ -93,12 +90,8 @@ with st.container(border=True):
 carLeft, carRight = st.columns([6,4])
 with carLeft:
     st.subheader("Oversigt over biler")
-    with st.container(border=True):
-        if not canConnect:
-            st.dataframe(dataframe, hide_index=True)
-            st.write("Can't connect :(")
-        else:
-            st.dataframe(dataframe, hide_index=True)
+    with st.container(border=True): # Dataframe opdateres ved hver ændring i text_input eller button presses.
+        st.dataframe(dataframe, hide_index=True)
         
 
 with carRight:
@@ -190,7 +183,7 @@ with carRight:
                         }, headers={"Authorization": controller.get("Authorization")})
                         st.rerun()
                     except:
-                        st.write(f":red[Kunne ikke tilføje bil.]")
+                        st.write(f":red[Kunne ikke tilføje bil.]") # Bør ændres til at skrive error code osv.
 
     with tab3:
         with st.container(border=True):
