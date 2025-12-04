@@ -141,5 +141,16 @@ def getAllComplaints():
     response = requests.get(f"{CUSTOMER_SERVICE}/complaints")
     return jsonify(response.json()), response.status_code
 
+@app.route('/registrations', methods=['GET'])
+def getAllregistrations():
+
+    # response = requests.get("http://customer-support-service:5003/complaints")
+
+    response = requests.get(f"{DAMAGE_REGISTRATION_SERVICE}/registrations")
+    return jsonify(response.json()), response.status_code
+
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
