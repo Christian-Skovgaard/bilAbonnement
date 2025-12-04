@@ -71,9 +71,33 @@ services:
     networks:
       - micro-net      
 
-     
+  employee-management-service:
+    container_name: employee-management-service
+    build:
+      context: ./EmployeeManagementService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5005:5005" # Map the container port to the host port
+    volumes:
+      - ./EmployeeManagementService/Service:/app # Mount the local directory to the container
+    networks:
+      - micro-net
 
-
+  employee-management-db:
+    container_name: employee-management-db
+    image: mysql:latest # Use the latest MongoDB image
+    environment:
+      MYSQL_ROOT_PASSWORD: password # super sikkert
+      MYSQL_DATABASE: employee_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: MegaIsbjørn
+    volumes:
+      - employee-management-db:/data/db # Persist the data locally
+      - ./EmployeeManagementService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "8006:3307" # Map the container port to the host port
+    networks:
+      - micro-net
 
   customer-support-service:
     container_name: customer-support-service
@@ -109,6 +133,8 @@ volumes:
   authorization-db:
     driver: local # Use the local volume driver
   customer-service-db:
+    driver: local
+  employee-management-db:
     driver: local
 
 networks:
