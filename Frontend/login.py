@@ -15,7 +15,7 @@ with st.container(border=True):
     password = st.text_input(label="Password", type="password")
 
     st.write(str(username))
-
+    
     if st.button(label="Log ind"):
         st.write(f"{username}, {password}")
         response = requests.post("http://localhost:5001/getAuthToken", json={"username": username, "password": password})

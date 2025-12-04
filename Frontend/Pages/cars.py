@@ -27,9 +27,9 @@ try:
     dataframe = pd.DataFrame(cars)
     canConnect = True
 except:
-        st.switch_page("login.py")
-        canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
-        dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
+    st.switch_page("login.py")
+    canConnect = False # Eksisterer kun, hvis der findes en bedre løsning til at håndtere, at car-catalog-service er nede (AuthToken er stadig valid).
+    dataframe = [] # Brugeren skal ikke smides ud, bare fordi car-catalog-service ikke kører.
 
 # Streamlit
 
