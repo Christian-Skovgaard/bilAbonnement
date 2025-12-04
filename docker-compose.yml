@@ -102,6 +102,36 @@ services:
     networks:
       - micro-net      
 
+  damage-registration-service:
+    container_name: damage-registration-service
+    build:
+      context: ./DamageRegistrationService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5005:5005" # Map the container port to the host port
+    environment:
+      MONGO_URI: "mongodb://damage-registrations-db:27017/damage-registrations-db" # Use the service name as the hostname
+    volumes:
+      - ./DamageRegistrationService/Service:/app # Mount the local directory to the container
+    depends_on:
+      - car-catalog-db # Wait for the mongo service to be ready
+    networks:
+      - micro-net
+
+  damage-registrations-db:
+    container_name: damage-registrations-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - damage-registrations-db:/data/db # Persist the data locally
+      - ./DamageRegistrationService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27020:27017" # Map the container port to the host port
+    networks:
+      - micro-net  
+
+
+
+
 
 volumes:
   car-catalog-db:
@@ -109,6 +139,8 @@ volumes:
   authorization-db:
     driver: local # Use the local volume driver
   customer-service-db:
+    driver: local
+  damage-registrations-db:
     driver: local
 
 networks:

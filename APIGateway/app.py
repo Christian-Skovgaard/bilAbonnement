@@ -16,6 +16,7 @@ services = {
 CAR_CATALOG_SERVICE = "http://car-catalog-service:5002" # føles som noget som burde være i .env, specielt når det er med stort
 CUSTOMER_SERVICE = "http://customer-support-service:5003/"
 AUTHORIZATION_SERVICE = "http://authorization-service:5004" # "http://authorization-service:5004"
+DAMAGE_REGISTRATION_SERVICE = "http://damage-registration-service:5005"
 
 def getJWTPublicKey():
     url = f"{AUTHORIZATION_SERVICE}/getPublicKey"
