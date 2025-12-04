@@ -100,7 +100,34 @@ services:
     ports:
       - "27019:27017" # Map the container port to the host port
     networks:
-      - micro-net      
+      - micro-net    
+
+  subscription-management-service:
+    container_name: subscription-management-service
+    build:
+      context: ./SubscriptionManagementService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5003:5003" # Map the container port to the host port
+    environment:
+      MONGO_URI: "mongodb://subscription-management-db:27017/subscriptionDB" # Use the service name as the hostname
+    volumes:
+      - ./SubscriptionManagementService/Service:/app # Mount the local directory to the container
+    depends_on:
+      - customer-service-db # Wait for the mongo service to be ready
+    networks:
+      - micro-net  
+
+  subscription-management-db:
+    container_name: subscription-management-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - subscription-management-db:/data/db # Persist the data locally
+      - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27020:27017" # Map the container port to the host port
+    networks:
+      - micro-net
 
 
 volumes:
