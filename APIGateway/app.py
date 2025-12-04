@@ -48,7 +48,7 @@ def test():
 
 
 @app.route('/<service>/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
-@jwt_required(optional=True)
+@jwt_required()
 def lyskryds(service, path):
 
     if not service in services:
@@ -61,7 +61,7 @@ def lyskryds(service, path):
         url=url,
         headers=dict(request.headers), # vi omformaterer fordi req-headersne har formatet flak-header, men headers argumentet forventer dict
         params=request.args,
-        data=request.get_data(),
+        json=request.get_json(),
     )
 
     clientResponse = Response(

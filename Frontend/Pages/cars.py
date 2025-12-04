@@ -26,9 +26,9 @@ def hasEmpty(list):
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization")})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/cars", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization")})
     cars = response.json()
     dataframe = pd.DataFrame(cars)
     canConnect = True
@@ -161,7 +161,7 @@ with carRight:
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
                     st.write("Send request :3") # POST request goes here
-                #    response = requests.post("http://localhost:5001/addCar", json={
+                #    response = requests.post("http://localhost:5001/car-catalog-service/addCar", json={
                 #        "regNr": addRegNr,
                 #        "brand": addBrand,
                 #        "model": addModel,
@@ -181,7 +181,7 @@ with carRight:
                     st.write(f":red[Indtast registreringsnummer]")
                 else:
                     try:
-                        updateResponse = requests.get(f"http://localhost:5001/cars/query?regNr={updateRegNr}", headers={"Authorization": controller.get("Authorization")})
+                        updateResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={updateRegNr}", headers={"Authorization": controller.get("Authorization")})
                     except:
                         if "Authorization" in controller.getAll():
                             controller.remove("Authorization")
