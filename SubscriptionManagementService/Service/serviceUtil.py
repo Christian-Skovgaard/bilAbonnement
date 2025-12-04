@@ -9,7 +9,7 @@ load_dotenv()
 def onSubscriptionStart ():
     authHeader = getAuthHeader()
     
-    # skrive og resavere bilen
+    # skrive og resaverer bilen
     # opdatere aktiv status i db
     
 

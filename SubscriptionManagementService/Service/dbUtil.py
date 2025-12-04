@@ -10,7 +10,13 @@ mydb = myclient["subscription-db"] # Choose database "car-catalog-db"
 mycol = mydb["subscription"] # Choose collection
 
 def insertSubscription (subObj):
-    result = mycol.insert_one(subObj)
-    print(f"Subscription inserted with _id: {result.inserted_id}")
-    return {id: result.inserted_id}
+    try:
+        result = mycol.insert_one(subObj)
+        print(f"Subscription inserted with _id: {result.inserted_id}")
+        return {
+            "succes": True,
+            "id": result.inserted_id
+            }
+    except:
+        return {"succes": False}
    
