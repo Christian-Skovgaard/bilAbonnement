@@ -7,7 +7,10 @@ import os
 services = {
     "car-catalog-service": "http://car-catalog-service:5002",
     "customer-support-service": "http://customer-support-service:5003/",
-    "authorization-service": "http://authorization-service:5004"
+    "authorization-service": "http://authorization-service:5004",
+    "customer-managment-service": "temp:5005",
+    "subscription-managment-service": "temp:5006",
+    "payment-service": "temp:5007"
 }
 
 app = Flask(__name__)
@@ -39,16 +42,17 @@ def getAuthToken():
 
 #endpoint der hjælper med at teste om vi for svar
 @app.route('/heath', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def test():
-    auth = get_jwt()
-    headers = request.headers
     return jsonify(heath="tip top form 🏋️")
 
 
 @app.route('/<service>/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @jwt_required(optional=True)
 def lyskryds(service, path):
+
+    if not service in services:
+        return jsonify(msg="no service with that name")
 
     url = f"{services[service]}/{path}"
 
