@@ -32,6 +32,12 @@ def updateQueryParams(input, parameter):
     else:
         st.query_params[parameter] = input
 
+def removeEmptyFromDict(dict):
+    result = {}
+    for key, value in dict.items():
+        if (value != "") and (value != None):
+            result[key] = value
+    return result
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
@@ -166,12 +172,11 @@ with carRight:
             
             addAvailable = st.checkbox(label="Tilgængelig", key="addAvailable", value=False)
             
-            if st.button(label="Tilføj"):
+            if st.button(label="Tilføj", type="primary"):
                 if hasEmpty([addRegNr, addBrand, addModel, addModelYear, addPropellant, addKmDriven, addPrice]): # Hvis et af felterne ikke er udfyldt.
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
-                    try:
-                        response = requests.post("http://localhost:5001/car-catalog-service/cars", json={ # BUG: Bil bliver oprettet uden at trykke på knappen, hvis et felt opdateres efter fejlet forsøg.
+                    addResponse = requests.post("http://localhost:5001/car-catalog-service/cars", json={
                             "regNr": addRegNr.replace(" ", ""),
                             "brand": addBrand,
                             "model": addModel,
@@ -181,81 +186,52 @@ with carRight:
                             "monthlyPrice": addPrice,
                             "available": addAvailable
                         }, headers={"Authorization": controller.get("Authorization")})
+                    if addResponse.status_code != 201:
+                        st.write(f":red[Kunne ikke tilføje bil]. Statuskode: {addResponse.status_code}")
+                    else:
                         st.rerun()
-                    except:
-                        st.write(f":red[Kunne ikke tilføje bil.]") # Bør ændres til at skrive error code osv.
 
     with tab3:
-        with st.container(border=True):
+        with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.
             updateRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer", key="updateRegNr")
 
-            if st.button(label="Find bil", key="updateFindCar"):
-                if updateRegNr == "":
-                    st.write(f":red[Indtast registreringsnummer]")
-                else:
-                    try:
-                        updateResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={updateRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
-                    except:
-                        if "Authorization" in controller.getAll():
-                            controller.remove("Authorization")
-                        if "JWT" in controller.getAll():
-                            controller.remove("JWT")
-                        st.switch_page("login.py")
+            updateBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", key="updateBrand")
+            updateModel = st.text_input(label="Model", placeholder="Indtast model", key="updateModel")
+            updateCol1, updateCol2 = st.columns(2)
+            with updateCol1:
+                updateModelYear = st.number_input(label="Årstal", step=1,placeholder="Indtast årstal", key="updateModelYear", value=None)
+            with updateCol2:
+                updatePropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", key="updatePropellant")
+            updateCol3, updateCol4 = st.columns(2)
+            with updateCol3:
+                updateKmDriven = st.number_input(label="Km kørt", step=1, placeholder="Indtast km kørt", key="updateKmDriven", value=None)
+            with updateCol4:
+                updatePrice = st.number_input(label="Månedlig pris", step=1, placeholder="Indtast pris", key="updatePrice", value=None)
+            updateAvailable = st.checkbox(label="Tilgængelig", key="updateAvailable")
 
-                    if len(updateResponse.json()) == 0:
-                        st.write(f":red[Bil ikke fundet]")
-                    elif len(updateResponse.json()) > 1:
-                        st.write(f":red[Flere biler fundet - specificer registreringsnummer]")
-                    else:
-                        updateBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", value=updateResponse.json()[0]["brand"])
-                        updateModel = st.text_input(label="Model", placeholder="Indtast model", value=updateResponse.json()[0]["model"])
-                        updateCol1, updateCol2 = st.columns(2)
-                        with updateCol1:
-                            updateModelYear = st.text_input(label="Årstal", placeholder="Indtast årstal", value=updateResponse.json()[0]["modelYear"])
-                        with updateCol2:
-                            updatePropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", value=updateResponse.json()[0]["propellant"])
-                        updateCol3, updateCol4 = st.columns(2)
-                        with updateCol3:
-                            updateKmDriven = st.text_input(label="Km kørt", placeholder="Indtast km kørt", value=updateResponse.json()[0]["kmDriven"])
-                        with updateCol4:
-                            updatePrice = st.text_input(label="Månedlig pris", placeholder="Indtast pris", value=updateResponse.json()[0]["monthlyPrice"])
-                        if st.button(label="Opdater bil", type="primary"):
-                            st.write("Ok :3") # PUT request goes here.
+            if st.button(label="Opdater bil", type="primary"):
+                updateResponse = requests.put(f"http://localhost:5001/car-catalog-service/cars/{updateRegNr.replace(" ", "")}", json=removeEmptyFromDict({
+                    "brand": updateBrand,
+                    "model": updateModel,
+                    "modelYear": updateModelYear,
+                    "propellant": updatePropellant,
+                    "kmDriven": updateKmDriven,
+                    "monthlyPrice": updatePrice,
+                    "available": updateAvailable}), 
+                                              headers={"Authorization": controller.get("Authorization")})
+                if updateResponse.status_code == 200:
+                    st.rerun()
+                else:
+                    st.write(f":red[Kunne ikke opdatere bilen. Statuskode: {updateResponse.status_code}]")
 
     with tab4: # Mangler access control via. roles
-        with st.container(border=True):
-            removeRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer", key="removeRegNr")
+        with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.
+            removalRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer", key="removalRegNr")
 
-            if st.button(label="Find bil"):
-                if removeRegNr == "":
-                    st.write(f":red[Indtast registreringsnummer]")
+            if st.button(label="Slet bil", type="primary"):
+                removalResponse = requests.delete(f"http://localhost:5001/car-catalog-service/cars/{removalRegNr}", headers={"Authorization": controller.get("Authorization")})
+                if removalResponse.status_code == 200:
+                    st.write("Bilen er nu slettet.")
+                    st.rerun()
                 else:
-                    try:
-                        removalResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={removeRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
-                    except:
-                        if "Authorization" in controller.getAll():
-                            controller.remove("Authorization")
-                        if "JWT" in controller.getAll():
-                            controller.remove("JWT")
-                        st.switch_page("login.py")
-
-                    if len(removalResponse.json()) == 0:
-                        st.write(f":red[Bil ikke fundet]")
-                    elif len(removalResponse.json()) > 1:
-                        st.write(f":red[Flere biler fundet - specificer registreringsnummer]")
-                    else:
-                        removalBrand = st.text_input(label="Mærke", placeholder="Indtast mærke", value=removalResponse.json()[0]["brand"], disabled=True, key="removalBrand")
-                        removalModel = st.text_input(label="Model", placeholder="Indtast model", value=removalResponse.json()[0]["model"], disabled=True, key="removalModel")
-                        removalCol1, removalCol2 = st.columns(2)
-                        with removalCol1:
-                            removalModelYear = st.text_input(label="Årstal", placeholder="Indtast årstal", value=removalResponse.json()[0]["modelYear"], disabled=True, key="removalmodelYear")
-                        with removalCol2:
-                            removalPropellant = st.text_input(label="Drivmiddel", placeholder="Indtast drivmiddel", value=removalResponse.json()[0]["propellant"], disabled=True, key="removalPropellant")
-                        removalCol3, removalCol4 = st.columns(2)
-                        with removalCol3:
-                            removalKmDriven = st.text_input(label="Km kørt", placeholder="Indtast km kørt", value=removalResponse.json()[0]["kmDriven"], disabled=True, key="removalKmDriven")
-                        with removalCol4:
-                            removalPrice = st.text_input(label="Månedlig pris", placeholder="Indtast pris", value=removalResponse.json()[0]["monthlyPrice"], disabled=True, key="removalPrice")
-                        st.write(f":red[Er du sikker på, at du vil slette denne bil?]")
-                        if st.button(label="Slet bil", type="primary"):
-                            st.write("Ok :3") # DELETE request goes here.
+                    st.write(f":red[Bilen kunne ikke findes.]")
