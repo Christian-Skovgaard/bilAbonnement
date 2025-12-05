@@ -145,8 +145,8 @@ with damagesRight:
                         for something in dataframe.items():
                             if something[0] != "_id":
                                 addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
-                        addResponse = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
-                        if addResponse.status_code == 200:
+                        addResponse = requests.post(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageRegNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
+                        if addResponse.status_code == 201:
                             st.rerun()
                         else:
                             st.write("Kunne ikke tilføje bil.")
