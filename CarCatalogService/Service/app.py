@@ -79,7 +79,7 @@ def add_car():
     return jsonify(data), 201
 
 # Change car details by regNr
-@app.route('/cars/regNr/<regNr>', methods=['PUT'])
+@app.route('/cars/<regNr>', methods=['PUT'])
 def update_car(regNr):
     trimmedRegNr = regNr.strip(" ")  # Remove leading/trailing spaces
     data = request.get_json(force=True)
