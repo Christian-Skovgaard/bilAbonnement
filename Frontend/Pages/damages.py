@@ -106,7 +106,7 @@ with damagesRight:
                 if removalResponse.status_code == 200:
                     st.rerun()
                 else:
-                    st.write("Fejl!") # Dette 
+                    st.write("Fejl!") # Dette burde ikke blive set på grund af Streamlits skærm refresh.
     elif "damageRegNr" in st.session_state:
         st.subheader("Tilføj skadesrapport")
     else:
