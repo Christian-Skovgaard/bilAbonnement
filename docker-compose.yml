@@ -127,7 +127,7 @@ services:
     ports:
       - "27021:27017" # Map the container port to the host port
     networks:
-      - micro-
+      - micro-net
     
   customer-management-service:
     container_name: customer-management-service
@@ -152,7 +152,7 @@ services:
       - customer-management-db:/data/db # Persist the data locally
       - ./CustomerManagementService/Database/init:/docker-entrypoint-initdb.d
     ports:
-      - "27021:27017" # Map the container port to the host port
+      - "27022:27017" # Map the container port to the host port
     networks:
       - micro-net
 
@@ -165,6 +165,8 @@ volumes:
   customer-service-db:
     driver: local
   subscription-management-db:
+    driver: local
+  customer-management-db:
     driver: local
 
 networks:
