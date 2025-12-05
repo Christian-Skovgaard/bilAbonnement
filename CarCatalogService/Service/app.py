@@ -26,12 +26,11 @@ def search_cars():
             query.append({key: True})
         elif value.lower() == ("false"):
             query.append({key: False})
-        else:
-            try: # Is integer?
-                query.append({key: int(value)})
-            except: # Is string.
-                if queryParams[key] != "": # Ignorerer parametre som "cars/query?regNr=&model="
-                    query.append({key: Regex(value, "i")})
+        elif value.isdigit():
+            query.append({key: int(value)})
+        else: # Is string.
+            if queryParams[key] != "": # Ignorerer parametre som "cars/query?regNr=&model="
+                query.append({key: Regex(value, "i")})
         
     if query:
         mongo_filter = {"$and": query} # Request parameters given.
