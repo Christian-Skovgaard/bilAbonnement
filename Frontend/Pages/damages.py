@@ -94,9 +94,12 @@ with damagesLeft:
         else:
             st.write("Indtast registreringsnummer for at se tilhørende skadesrapporter.")
 
+
 with damagesRight:
     if "damageDetails" in st.session_state:
         st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
+    elif "damageRegNr" in st.session_state:
+        st.subheader("Tilføj skadesrapport")
     else:
         st.subheader("Kontrolpanel")
     with st.container(border=True):
@@ -106,12 +109,20 @@ with damagesRight:
                 for damageKey, damageValue in st.session_state.damageDetails.items():
                     if damageKey != "_id":
                         st.text_input(label=damageKey, placeholder=f"Indtast {damageKey}", value=damageValue)
-            else:
-                st.write("Vælg en skadesrapport for at se mere.")
+            else: # Reg. nr. valgt, men ikke specifik skadesrapport.
+                for something in dataframe.items():
+                    if something[0] != "_id":
+                        st.text_input(label=something[0].title(), placeholder=f"Indtast {something[0]}", key=f"input{something[0]}")
+                    
+                if st.button("Tilføj"):
+                    addDamageBody = {}
+                    for something in dataframe.items():
+                        if something[0] != "_id":
+                            addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
+                    response = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
+                    st.rerun()
         else:
             damageRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer")
             if st.button("Find skadesrapporter"):
                 st.session_state["damageRegNr"] = damageRegNr
                 st.rerun()
-        if 'key' not in st.session_state:
-            st.session_state['key'] = 'value'
