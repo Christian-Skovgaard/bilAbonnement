@@ -223,7 +223,8 @@ volumes:
     driver: local # Use the local volume driver
   customer-service-db:
     driver: local
-
+  customer-management-db:
+    driver: local
   damage-registrations-db:
     driver: local
 

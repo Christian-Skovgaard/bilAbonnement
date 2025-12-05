@@ -17,19 +17,16 @@ def get_damageCases():
 #Search damageCases med regNr
 @app.route('/damageCases/<regnr>/query', methods=['GET'])
 def search_damageCases(regnr):
-    trimmedRegNr = regnr.replace(" ", "") 
-
+    # Brug regnr direkte uden at fjerne mellemrum
     queryParams = request.args
-    query = [{"regNr": trimmedRegNr}]  
+    query = [{"regNr": regnr}]  
 
+    # Tilføj yderligere query-parametre som regex
     for key, value in queryParams.items():
         if value != "":
-            query.append({ key: { "$regex": value, "$options": "i" } })
+            query.append({key: {"$regex": value, "$options": "i"}})
 
-    if query:
-        mongo_filter = {"$and": query}
-    else:
-        mongo_filter = {}
+    mongo_filter = {"$and": query} if query else {}
 
     cursor = mycol.find(mongo_filter, {"_id": 0})
     damageCases = list(cursor)
