@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-myclient = pymongo.MongoClient("mongodb://localhost:27021/") # "mongodb://subscription-management-db:27017"
+myclient = pymongo.MongoClient("mongodb://subscription-management-db:27017") # "mongodb://subscription-management-db:27017"
 mydb = myclient["subscriptionDB"] # Choose database "car-catalog-db"
 mycol = mydb["subscriptions"] # Choose collection
 
