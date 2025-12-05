@@ -19,9 +19,20 @@ def get_cases():
         damageCases.append(doc)
     return jsonify(damageCases)
 
-#Search damageCases med regNr
-@app.route('/cases/<regnr>/query', methods=['GET'])
+# Find damageCases for regNr
+@app.route('/cases/<regnr>', methods=['GET'])
 def get_cases_by_regnr(regnr):
+    cursor = mycol.find({"regNr" : regnr})
+    damageCases = []
+    for doc in cursor:
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
+    return jsonify(damageCases)
+
+# Query damageCases med regNr
+@app.route('/cases/<regnr>/query', methods=['GET'])
+def query_by_regnr(regnr):
     queryParams = request.args
     query = [{"regNr": regnr}]
     for key, value in queryParams.items():

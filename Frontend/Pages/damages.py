@@ -121,8 +121,14 @@ with damagesRight:
                             addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
                     response = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
                     st.rerun()
-        else:
+        else: # Reg. nr. ikke valgt.
             damageRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer")
             if st.button("Find skadesrapporter"):
-                st.session_state["damageRegNr"] = damageRegNr
-                st.rerun()
+                findResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
+                if len(findResponse.json()) == 1: # Hvis præcis et resultat findes, vis skadesrapporter for gældende reg. nr.
+                    st.session_state["damageRegNr"] = findResponse.json()[0]["regNr"]
+                    st.rerun()
+                elif len(findResponse.json()) > 1:
+                    st.write(f":red[Flere resultater fundet - præcisér reg. nr.]")
+                else:
+                    st.write(f":red[Ingen bil fundet.]")
