@@ -15,8 +15,31 @@ services = {
     "customer-management-service": "http://customer-management-service:5009"
 }
 
+
+CAR_CATALOG_SERVICE = "http://car-catalog-service:5002" # føles som noget som burde være i .env, specielt når det er med stort
+CUSTOMER_SERVICE = "http://customer-support-service:5003/"
+AUTHORIZATION_SERVICE = "http://authorization-service:5004" # "http://authorization-service:5004"
+DAMAGE_REGISTRATION_SERVICE = "http://damage-registration-service:5005"
+
+def getJWTPublicKey():
+    url = f"{AUTHORIZATION_SERVICE}/getPublicKey"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        key = data.get("key")
+        if key and isinstance(key, str):
+            # Convert escaped newlines to real newlines
+            key = key.encode('utf-8').decode('unicode_escape')
+        print("Successfully retrieved JWT public key!")
+        return key
+    except Exception as e:
+        print(f"ERROR getting JWT public key: {e}")
+        return None
+
 app = Flask(__name__)
 jwt = JWTManager(app)
+
 
 resp = requests.get("http://authorization-service:5004/getPublicKey")
 PUBLIC_KEY = resp.json()["key"]
@@ -74,6 +97,17 @@ def lyskryds(service, path):
         )
 
     return clientResponse
+
+@app.route('/damageCases', methods=['GET'])
+def getAllregistrations():
+
+    # response = requests.get("http://customer-support-service:5003/complaints")
+
+    response = requests.get(f"{DAMAGE_REGISTRATION_SERVICE}/damageCases")
+    return jsonify(response.json()), response.status_code
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
