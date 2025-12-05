@@ -8,6 +8,7 @@ db.createCollection("cars", {
     $jsonSchema: {
       bsonType: "object",
       required: ["regNr", "brand", "model", "modelYear", "propellant", "kmDriven", "monthlyPrice", "available"],
+      additionalProperties: false,
       properties: {
         regNr: {
           bsonType: "string",
