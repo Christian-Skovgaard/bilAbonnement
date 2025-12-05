@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import pymongo
+from bson import Regex
 
 myclient = pymongo.MongoClient("mongodb://car-catalog-db:27017")
 mydb = myclient["car-catalog-db"] # Choose database "car-catalog-db"
@@ -21,8 +22,8 @@ def search_cars():
     query = []
 
     for key, value in queryParams.items():
-        if value != "":
-            query.append({key: value}) # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
+        if value != "": # Ignorerer parametre som "cars/query?regNr=&model="
+            query.append({key: Regex(value, "i")}) # # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
 
     if query:
         mongo_filter = {"$and": query} # Request parameters given.
@@ -32,6 +33,73 @@ def search_cars():
     cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
     cars = list(cursor)
     return jsonify(cars)
+
+#Get cars by kilometer range
+@app.route('/cars/kilometer', methods=['GET'])
+def get_cars_by_kilometer():
+    min_km = request.args.get('min', type=int)
+    max_km = request.args.get('max', type=int)
+
+    mongo_filter = {
+        "kmDriven": {
+            "$gte": min_km,
+            "$lte": max_km
+        }
+    }
+
+    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
+    cars = list(cursor)
+    return jsonify(cars)
+
+#Get cars by price range
+@app.route('/cars/price', methods=['GET'])
+def get_cars_by_price():
+    min_price = request.args.get('min', type=int)
+    max_price = request.args.get('max', type=int)
+
+    mongo_filter = {
+        "monthlyPrice": {
+            "$gte": min_price,
+            "$lte": max_price
+        }
+    }
+
+    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
+    cars = list(cursor)
+    return jsonify(cars)
+
+
+# Add a new car
+@app.route('/cars', methods=['POST'])
+def add_car():
+    data = request.get_json(force=True)
+    cursor = mycol.insert_one(data)
+    # convert ObjectId to string for JSON serialization
+    data['_id'] = str(cursor.inserted_id)
+    return jsonify(data), 201
+
+# Change car details by regNr
+@app.route('/cars/<regNr>', methods=['PUT'])
+def update_car(regNr):
+    trimmedRegNr = regNr.strip(" ")  # Remove leading/trailing spaces
+    data = request.get_json(force=True)
+    car = mycol.find_one({"regNr": trimmedRegNr})
+    if not car:
+        return jsonify({"error": "Car not found"}), 404
+    
+    mycol.update_one({"regNr": trimmedRegNr}, {"$set": data})
+    updated_car = mycol.find_one({"regNr": trimmedRegNr}, {"_id": 0})
+    return jsonify(updated_car)
+
+@app.route('/cars/<regNr>', methods=['DELETE'])
+def delete_car(regNr):
+    trimmedRegNr = regNr.strip(" ")  # Remove leading/trailing spaces
+    car = mycol.find_one({"regNr": trimmedRegNr})
+    if not car:
+        return jsonify({"error": "Car not found"}), 404
+    
+    mycol.delete_many({"regNr": trimmedRegNr}) # delete_many bare lige, hvis der på mærkelig vis var flere biler med samme reg. nr.
+    return jsonify("Car deleted.", 200)
 
 
 if __name__ == '__main__':

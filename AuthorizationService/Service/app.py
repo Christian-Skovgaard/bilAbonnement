@@ -21,7 +21,7 @@ with open(os.path.join(script_dir, "keys/public_key.pem"), "r") as f:
 app.config["JWT_ALGORITHM"] = "RS256"
 app.config["JWT_PRIVATE_KEY"] = PRIVATE_KEY
 app.config["JWT_PUBLIC_KEY"] = PUBLIC_KEY
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=2) # OBS!!! Ændret til 2 minutter for testing.
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=30) # OBS!!! Ændret til 2 minutter for testing.
 
 jwt = JWTManager(app)
 
@@ -54,24 +54,6 @@ def getAuthToken():
 @app.route("/getPublicKey", methods=["GET"])
 def getPublicKey ():
     return {"key": PUBLIC_KEY}
-
-
-@app.route("/admin", methods=["GET"])
-@jwt_required()
-def superSecretMicroService():
-    claims = get_jwt()
-    
-    return jsonify(claims)
-
-
-
-@app.route('/', methods=['GET'])
-def test():
-    return "hello there"
-
-@app.route('/test', methods=['GET'])
-def test2():
-    return "hello there"
 
 app.run(host='0.0.0.0', debug=True, port=5004)
 

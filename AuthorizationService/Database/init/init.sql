@@ -4,7 +4,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50),
     password VARCHAR(255) NOT NULL,
-    role ENUM('user','admin','leadership') DEFAULT 'user',
+    role ENUM('application','user','admin','leadership') DEFAULT 'user',
     department ENUM('Aarhus','Koling','København') DEFAULT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -13,4 +13,7 @@ CREATE TABLE users (
 
 INSERT INTO users (username, password, role, department) VALUES
 ('Bo', 'Elefant', 'admin', 'Koling'),
-('AndersElten42', 'chalklin', 'user', 'København')
+('AndersElten42', 'chalklin', 'user', 'København'),
+('custommerManagementService','Ugenkendlig Thai-ret','application',NULL),
+('subscriptionManagementService','Hungren efter druknedoed','application',NULL)
+
