@@ -129,6 +129,32 @@ services:
     networks:
       - micro-net
 
+  task-management-service:
+    container_name: task-management-service
+    build:
+      context: ./TaskManagementService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5010:5010" # Map the container port to the host port
+    environment: 
+      MONGO_URI: "mongodb://task-management-db:27020/task-management-db" # Use the service name as the hostname
+    volumes:
+      - ./TaskManagementService/Service:/app # Mount the local directory to the container
+    depends_on:
+      - task-management-db # Wait for the mongo service to be ready
+    networks:
+      - micro-net
+
+  task-management-db:
+    container_name: task-management-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - task-management-db:/data/db # Persist the data locally
+      - ./TaskManagementService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27020:27017" # Map the container port to the host port
+    networks:
+      - micro-net
 
 volumes:
   car-catalog-db:
@@ -139,6 +165,9 @@ volumes:
     driver: local
   subscription-management-db:
     driver: local
+  task-management-db:
+    driver: local
+  
 
 networks:
   micro-net:
