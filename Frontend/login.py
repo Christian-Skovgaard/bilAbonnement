@@ -3,6 +3,7 @@ from streamlit_cookies_controller import CookieController
 import requests
 
 controller = CookieController()
+st.query_params = {} # Hvis du er sendt tilbage til login skal alle query params fjernes.
 
 st.set_page_config(page_title="Log ind | Bilabonnement", page_icon="⏱️", layout="centered")
 
