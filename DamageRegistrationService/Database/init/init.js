@@ -7,8 +7,7 @@ db.createCollection("damageCases");
 // Insert sample documents
 db.damageCases.insertMany([
   {
-    caseId: 1,
-    regNr: "XD 69 420",
+    regNr: "XD69420",
     car: "Toyota",
     model: "GT86",
     modelYear: 20014,
@@ -16,8 +15,7 @@ db.damageCases.insertMany([
     date: "2025-01-12"
   },
   {
-    caseId: 2,
-    regNr: "XD 69 420",
+    regNr: "XD69420",
     car: "audi",
     model: "rs6",
     modelYear: 20016,

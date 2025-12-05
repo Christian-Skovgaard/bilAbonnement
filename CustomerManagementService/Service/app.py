@@ -4,8 +4,8 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from bson import Regex
 
-myclient = pymongo.MongoClient("mongodb://localhost:27022")
-mydb = myclient["customerDB"] # Choose database "car-catalog-db"
+myclient = pymongo.MongoClient("mongodb://customer-management-db:27017")
+mydb = myclient["customer-management-db"] 
 mycol = mydb["customers"] # Choose collection
 
 app = Flask(__name__)

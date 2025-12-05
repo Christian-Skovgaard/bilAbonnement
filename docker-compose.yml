@@ -227,7 +227,6 @@ volumes:
     driver: local
   damage-registrations-db:
     driver: local
-
   subscription-management-db:
     driver: local
   task-management-db:

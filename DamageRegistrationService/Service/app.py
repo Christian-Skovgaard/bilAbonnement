@@ -28,22 +28,10 @@ def search_damageCases(regnr):
 
     mongo_filter = {"$and": query} if query else {}
 
-    cursor = mycol.find(mongo_filter, {"_id": 0})
+    cursor = mycol.find(mongo_filter)
     damageCases = list(cursor)
     return jsonify(damageCases)
-"""
-#POST complaints
-@app.route('/registrations', methods=['POST']) 
-def add_registrations():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No JSON body provided"}), 400
-    cursor = mycol.insert_one(data)
-    return jsonify({
-        "message": "Complaint added",
-        "inserted_id": str(cursor.inserted_id)
-    }), 201
-"""
+
 #POST på RegNr
 @app.route('/damageCases/<regNr>', methods=['POST'])
 def add_damagecase(regNr):
