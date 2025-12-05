@@ -82,6 +82,15 @@ def add_customer():
     data['_id'] = str(cursor.inserted_id)
     return jsonify(data), 201
 
+@app.delete('/customers/<customerId>')
+def deleteCustomer(customerId):
+
+    result = mycol.delete_one({"_id": ObjectId(customerId)}) # delete_many bare lige, hvis der på mærkelig vis var flere biler med samme reg. nr.
+    return jsonify({
+        "msg": "top sussecc 🏋️"
+    })
+
+
 
 
 @app.route('/test', methods=['GET'])
