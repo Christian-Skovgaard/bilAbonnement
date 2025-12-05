@@ -22,7 +22,7 @@ def search_cars():
     query = []
 
     for key, value in queryParams.items():
-        if value != "":
+        if value != "": # Ignorerer parametre som "cars/query?regNr=&model="
             query.append({key: Regex(value, "i")}) # # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
 
     if query:
@@ -90,6 +90,17 @@ def update_car(regNr):
     mycol.update_one({"regNr": trimmedRegNr}, {"$set": data})
     updated_car = mycol.find_one({"regNr": trimmedRegNr}, {"_id": 0})
     return jsonify(updated_car)
+
+@app.route('/cars/<regNr>', methods=['DELETE'])
+def delete_car(regNr):
+    trimmedRegNr = regNr.strip(" ")  # Remove leading/trailing spaces
+    car = mycol.find_one({"regNr": trimmedRegNr})
+    if not car:
+        return jsonify({"error": "Car not found"}), 404
+    
+    mycol.remove({"regNr": trimmedRegNr})
+    return jsonify("Car deleted.", 200)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
