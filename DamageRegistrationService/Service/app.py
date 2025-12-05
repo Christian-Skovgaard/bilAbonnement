@@ -1,40 +1,44 @@
 from flask import Flask, jsonify, request
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://damage-registrations-db:27017")
-mydb = myclient["damage-registrations-db"] # Choose database "car-catalog-db"
-mycol = mydb["damageCases"] # Choose collection
+myclient = pymongo.MongoClient("mongodb://damage-registration-db:27017")
+mydb = myclient["damage-registration-db"] # Choose database "car-catalog-db"
+mycol = mydb["cases"] # Choose collection
 
 app = Flask(__name__)
 
 # Get all damageCases
-@app.route('/damageCases', methods=['GET'])
-def get_damageCases():
-    cursor = mycol.find({}, {"_id": 0})
-    damageCases = list(cursor)
+@app.route('/cases', methods=['GET'])
+def get_cases():
+    cursor = mycol.find({})
+    damageCases = []
+    for doc in cursor:
+        # Convert ObjectId (or other non-JSON types) to string
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
     return jsonify(damageCases)
 
 #Search damageCases med regNr
-@app.route('/damageCases/<regnr>/query', methods=['GET'])
-def search_damageCases(regnr):
-    # Brug regnr direkte uden at fjerne mellemrum
+@app.route('/cases/<regnr>/query', methods=['GET'])
+def get_cases_by_regnr(regnr):
     queryParams = request.args
-    query = [{"regNr": regnr}]  
-
-    # Tilføj yderligere query-parametre som regex
+    query = [{"regNr": regnr}]
     for key, value in queryParams.items():
         if value != "":
             query.append({key: {"$regex": value, "$options": "i"}})
-
     mongo_filter = {"$and": query} if query else {}
-
     cursor = mycol.find(mongo_filter)
-    damageCases = list(cursor)
+    damageCases = []
+    for doc in cursor:
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
     return jsonify(damageCases)
 
 #POST på RegNr
-@app.route('/damageCases/<regNr>', methods=['POST'])
-def add_damagecase(regNr):
+@app.route('/cases/<regNr>', methods=['POST'])
+def add_case(regNr):
     data = request.get_json()
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
@@ -49,12 +53,9 @@ def add_damagecase(regNr):
         "inserted_id": str(cursor.inserted_id)
     }), 201
 
-
-
-
 #PUT damageCases med caseId 
-@app.route('/damageCases/<int:caseId>', methods=['PUT'])
-def update_damageCases(caseId):
+@app.route('/cases/<int:caseId>', methods=['PUT'])
+def update_case(caseId):
     data = request.get_json()
 
     if not data:
@@ -75,5 +76,3 @@ def update_damageCases(caseId):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5005)
-
-

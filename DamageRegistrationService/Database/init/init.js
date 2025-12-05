@@ -1,11 +1,11 @@
 // Switch to your database
-db = db.getSiblingDB("damage-registrations-db");
+db = db.getSiblingDB("damage-registration-db");
 
 // Create a collection
-db.createCollection("damageCases");
+db.createCollection("cases");
 
 // Insert sample documents
-db.damageCases.insertMany([
+db.cases.insertMany([
   {
     regNr: "XD69420",
     car: "Toyota",
