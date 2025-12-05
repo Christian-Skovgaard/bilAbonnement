@@ -21,10 +21,17 @@ def search_cars():
     queryParams = request.args # Dict of query parameters
     query = []
 
-    for key, value in queryParams.items():
-        if value != "": # Ignorerer parametre som "cars/query?regNr=&model="
-            query.append({key: Regex(value, "i")}) # # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
-
+    for key, value in queryParams.items():      
+        if value.lower() == ("true"): # Is boolean?
+            query.append({key: True})
+        elif value.lower() == ("false"):
+            query.append({key: False})
+        elif value.isdigit():
+            query.append({key: int(value)})
+        else: # Is string.
+            if queryParams[key] != "": # Ignorerer parametre som "cars/query?regNr=&model="
+                query.append({key: Regex(value, "i")})
+        
     if query:
         mongo_filter = {"$and": query} # Request parameters given.
     else:

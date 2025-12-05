@@ -10,6 +10,9 @@ db.createCollection("cars", {
       required: ["regNr", "brand", "model", "modelYear", "propellant", "kmDriven", "monthlyPrice", "available"],
       additionalProperties: false,
       properties: {
+        _id: {
+          bsonType: "objectId"
+        },
         regNr: {
           bsonType: "string",
           description: "must be a string and is required"

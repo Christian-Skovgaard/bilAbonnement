@@ -232,6 +232,8 @@ volumes:
     driver: local
   task-management-db:
     driver: local
+  customer-management-db:
+    driver: local
 
 
 

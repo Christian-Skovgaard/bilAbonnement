@@ -97,7 +97,6 @@ def lyskryds(service, path):
         )
 
     return clientResponse
-    
 
 @app.route('/damageCases', methods=['GET'])
 def getAllregistrations():
