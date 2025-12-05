@@ -64,7 +64,7 @@ with st.container(border=True):
 damagesLeft, damagesRight = st.columns([6,4])
 with damagesLeft:
     if "damageRegNr" in st.session_state:
-        test1, test2 = st.columns([1,8])
+        test1, test2 = st.columns([1,15], vertical_alignment="center")
         with test1:
             if st.button("<-"):
                 del st.session_state["damageRegNr"]
@@ -97,18 +97,25 @@ with damagesLeft:
 
 with damagesRight:
     if "damageDetails" in st.session_state:
-        st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
+        idHeaderCol, deleteCol = st.columns([8, 1], vertical_alignment="center")
+        with idHeaderCol:
+            st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
+        with deleteCol:
+            if st.button("Slet", type="primary"): # Slet skadesrapport funktionalitet.
+                st.write("Hi :3")
     elif "damageRegNr" in st.session_state:
         st.subheader("Tilføj skadesrapport")
     else:
         st.subheader("Kontrolpanel")
     with st.container(border=True):
         if "damageRegNr" in st.session_state:
-            if "damageDetails" in st.session_state:
+            if "damageDetails" in st.session_state: # Reg. nr. og specifik skadesrapport valgt.
                 detailsCount = 0 # Bruges til næste for-loop for columns.
                 for damageKey, damageValue in st.session_state.damageDetails.items():
                     if damageKey != "_id":
-                        st.text_input(label=damageKey, placeholder=f"Indtast {damageKey}", value=damageValue)
+                        st.text_input(label=damageKey.title(), placeholder=f"Indtast {damageKey}", value=damageValue)
+                if st.button("Gem ændringer"): # PUT funktionalitet. Knap kan evt. dukke op, når et text_input er blevet ændret.
+                    st.write("Hi :3")
             else: # Reg. nr. valgt, men ikke specifik skadesrapport.
                 for something in dataframe.items():
                     if something[0] != "_id":
