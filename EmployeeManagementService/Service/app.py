@@ -61,4 +61,28 @@ def query_employees():
     conn.close()
     return jsonify(employees)
 
-#
+#add employee
+@app.route('/employees', methods=['POST'])
+def add_employee():
+    data = request.get_json(force=True)
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    position = data.get('position')
+    hire_date = data.get('hire_date')
+    department_id = data.get('department_id')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO employees (first_name, last_name, position, hire_date, department_id) VALUES (%s, %s, %s, %s, %s)",
+        (first_name, last_name, position, hire_date, department_id)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Employee added successfully"}), 201
+
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True, port=5005)
