@@ -10,7 +10,10 @@ damageCases = []
 
 # Logik
 try:
-    response = requests.get("http://localhost:5001/damage-registration-service/cases", headers={"Authorization": controller.get("Authorization")})
+    if "damageRegNr" in st.session_state:
+        response = requests.get(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageRegNr"]}", headers={"Authorization": controller.get("Authorization")})
+    else:
+        response = requests.get("http://localhost:5001/damage-registration-service/cases", headers={"Authorization": controller.get("Authorization")})
     damageCases = response.json()
     dataframe = pd.DataFrame(damageCases)
 except:
@@ -117,9 +120,19 @@ with damagesRight:
                 detailsCount = 0 # Bruges til næste for-loop for columns.
                 for damageKey, damageValue in st.session_state.damageDetails.items():
                     if damageKey != "_id":
-                        st.text_input(label=damageKey.title(), placeholder=f"Indtast {damageKey}", value=damageValue)
+                        st.text_input(label=damageKey.title(), placeholder=f"Indtast {damageKey}", value=damageValue, key=f"update{damageKey}")
                 if st.button("Gem ændringer"): # PUT funktionalitet. Knap kan evt. dukke op, når et text_input er blevet ændret.
-                    st.write("Hi :3")
+                    updateBody = {}
+                    updateDamageBody = {}
+                    st.write(st.session_state.damageDetails.items())
+                    for something in st.session_state.damageDetails.items():
+                        if something[0] != "_id":
+                            updateDamageBody[str(something[0])] = st.session_state[f"update{something[0]}"]
+                    updateResponse = requests.put(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", json=updateDamageBody, headers={"Authorization": controller.get("Authorization")})
+                    if updateResponse.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.write(f"Case kunne ikke blive opdateret. Statuskode: {updateResponse.status_code}")
             else: # Reg. nr. valgt, men ikke specifik skadesrapport.
                 if len(dataframe) == 0: # Ingen skadesrapporter på reg. nr.
                     st.write("Ingen skadesrapporter på reg. nr.")
@@ -132,16 +145,19 @@ with damagesRight:
                         for something in dataframe.items():
                             if something[0] != "_id":
                                 addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
-                        response = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
-                        st.rerun()
+                        addResponse = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
+                        if addResponse.status_code == 200:
+                            st.rerun()
+                        else:
+                            st.write("Kunne ikke tilføje bil.")
         else: # Reg. nr. ikke valgt.
             damageRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer")
             if st.button("Find skadesrapporter"):
-                findResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
-                if len(findResponse.json()) == 1: # Hvis præcis 1 resultat findes, vis skadesrapporter for gældende reg. nr.
-                    st.session_state["damageRegNr"] = findResponse.json()[0]["regNr"]
+                findCarResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
+                if len(findCarResponse.json()) == 1: # Hvis præcis 1 resultat findes, vis skadesrapporter for gældende reg. nr.
+                    st.session_state["damageRegNr"] = findCarResponse.json()[0]["regNr"]
                     st.rerun()
-                elif len(findResponse.json()) > 1:
+                elif len(findCarResponse.json()) > 1:
                     st.write(f":red[Flere resultater fundet - præcisér reg. nr.]")
                 else:
                     st.write(f":red[Ingen bil fundet.]")
