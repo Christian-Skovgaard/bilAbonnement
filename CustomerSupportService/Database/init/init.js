@@ -6,6 +6,14 @@ db.createCollection("complaints");
 
 // Insert sample documents
 db.complaints.insertMany([
-  { complaintId: 1, name: "magnus", year: 2020 },
-  { complaintId: 2, name: "victor", year: 2021 }
-]);
+  { complaintId: 1, 
+    name: "magnus", 
+    date: "2020-01-10",
+    complaint: "help!!"
+  },
+
+{ complaintId: 2, 
+    name: "victor", 
+    date: "2020-01-10",
+    complaint: "help!!"
+}]);
