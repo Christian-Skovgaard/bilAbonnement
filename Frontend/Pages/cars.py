@@ -229,7 +229,7 @@ with carRight:
             removalRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer", key="removalRegNr")
 
             if st.button(label="Slet bil", type="primary"):
-                removalResponse = requests.delete(f"http://localhost:5001/car-catalog-service/cars/{removalRegNr}", headers={"Authorization": controller.get("Authorization")})
+                removalResponse = requests.delete(f"http://localhost:5001/car-catalog-service/cars/{removalRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
                 if removalResponse.status_code == 200:
                     st.write("Bilen er nu slettet.")
                     st.rerun()
