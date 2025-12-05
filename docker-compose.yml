@@ -36,8 +36,6 @@ services:
     volumes:
       - car-catalog-db:/data/db # Persist the data locally
       - ./CarCatalogService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27017:27017" # Map the container port to the host port
     networks:
       - micro-net      
 
@@ -66,8 +64,6 @@ services:
     volumes:
       - authorization-db:/data/db # Persist the data locally
       - ./AuthorizationService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "8005:3306" # Map the container port to the host port
     networks:
       - micro-net      
 
@@ -93,8 +89,6 @@ services:
     volumes:
       - customer-service-db:/data/db # Persist the data locally
       - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27019:27017" # Map the container port to the host port
     networks:
       - micro-net    
 
@@ -146,8 +140,6 @@ services:
     volumes:
       - subscription-management-db:/data/db # Persist the data locally
       - ./SubscriptionManagementService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27021:27017" # Map the container port to the host port
     networks:
       - micro-net
     
@@ -173,8 +165,6 @@ services:
     volumes:
       - customer-management-db:/data/db # Persist the data locally
       - ./CustomerManagementService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27022:27017" # Map the container port to the host port
     networks:
       - micro-net
 
@@ -200,8 +190,6 @@ services:
     volumes:
       - task-management-db:/data/db # Persist the data locally
       - ./TaskManagementService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27020:27017" # Map the container port to the host port
     networks:
       - micro-net
 
