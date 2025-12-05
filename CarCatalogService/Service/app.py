@@ -98,7 +98,7 @@ def delete_car(regNr):
     if not car:
         return jsonify({"error": "Car not found"}), 404
     
-    mycol.remove({"regNr": trimmedRegNr})
+    mycol.delete_many({"regNr": trimmedRegNr}) # delete_many bare lige, hvis der på mærkelig vis var flere biler med samme reg. nr.
     return jsonify("Car deleted.", 200)
 
 
