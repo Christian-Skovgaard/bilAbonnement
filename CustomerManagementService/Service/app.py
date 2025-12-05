@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import pymongo
 from bson import ObjectId
+from bson.errors import InvalidId
 from bson import Regex
 
 myclient = pymongo.MongoClient("mongodb://localhost:27022")
@@ -26,10 +27,6 @@ def search_customers():
     queryParams = request.args # Dict of query parameters
     query = []
 
-    newObj = {"age": 28, **queryParams}
-    
-    print(newObj)
-
     for key, value in queryParams.items():
         if (value != "" and type(value) is str):
             query.append({key: Regex(value, "i")}) # # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
@@ -52,12 +49,36 @@ def search_customers():
     return jsonify(customers)
 
 
+@app.put('/customers/<customerId>')
+def updateSub (customerId):
+    reqBody = request.get_json()
+    if not reqBody:
+        return jsonify("no body attached"), 400
+    
+    try:
+        # Convert string ID to ObjectId
+        obj_id = ObjectId(customerId)
+    except InvalidId:
+        return jsonify({"error": "Invalid ID format"}), 400
+
+
+    customer = mycol.find_one({"_id": obj_id})
+    if not customer:
+        return jsonify("subscription matching ID not found"), 400
+    
+    result = mycol.update_one({"_id": obj_id}, {"$set": reqBody})
+
+    return jsonify({
+        "message": "Update successful",
+        "matched_count": result.matched_count,
+        "modified_count": result.modified_count
+    })
+
 
 @app.route('/customers', methods=['POST'])
 def add_customer():
     data = request.get_json()
     cursor = mycol.insert_one(data)
-    # convert ObjectId to string for JSON serialization
     data['_id'] = str(cursor.inserted_id)
     return jsonify(data), 201
 
