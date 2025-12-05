@@ -7,73 +7,69 @@ db.createCollection("subscriptions");
 // Insert sample documents
 db.subscriptions.insertMany([
   {
-    regNr: "XD 69 420",
-    brand: "Toyota",
-    model: "GT86",
-    modelYear: 2012,
-    propellant: "Benzin",
-    kmDriven: 250000,
-    monthlyPrice: 8000,
-    available: true
+    "orderDate": "2025-12-01",
+    "startDate": "2025-12-02",
+    "endDate": "2026-02-22",
+    "active": true,
+    "pickupLocation": "Aarhus",
+    "associatedCustommerId": "12",
+    "associatedRegNr": "dj 4952",
+    "pricePrMonth": 3600,
+    "insuranceDealNr": 2
   },
   {
-    regNr: "JD 97 731",
-    brand: "Chevrolet",
-    model: "Suburban",
-    modelYear: 2006,
-    propellant: "Benzin",
-    kmDriven: 470000,
-    monthlyPrice: 4100,
-    available: true
+    "orderDate": "2025-11-20",
+    "startDate": "2025-11-22",
+    "endDate": "2026-01-15",
+    "active": true,
+    "pickupLocation": "Copenhagen",
+    "associatedCustommerId": "34",
+    "associatedRegNr": "ab 2039",
+    "pricePrMonth": 4100,
+    "insuranceDealNr": 1
   },
   {
-    regNr: "BQ 38 126",
-    brand: "Audi",
-    model: "A6",
-    modelYear: 2008,
-    propellant: "Benzin",
-    kmDriven: 360000,
-    monthlyPrice: 6000,
-    available: true
+    "orderDate": "2025-10-05",
+    "startDate": "2025-10-06",
+    "endDate": "2025-11-30",
+    "active": false,
+    "pickupLocation": "Aalborg",
+    "associatedCustommerId": "56",
+    "associatedRegNr": "cz 8810",
+    "pricePrMonth": 3300,
+    "insuranceDealNr": 3
   },
   {
-    regNr: "DO 17 851",
-    brand: "BMW",
-    model: "X1",
-    modelYear: 2019,
-    propellant: "Diesel",
-    kmDriven: 120000,
-    monthlyPrice: 9500,
-    available: false
+    "orderDate": "2025-12-10",
+    "startDate": "2025-12-12",
+    "endDate": "2026-03-10",
+    "active": true,
+    "pickupLocation": "Aarhus",
+    "associatedCustommerId": "78",
+    "associatedRegNr": "kd 4401",
+    "pricePrMonth": 3900,
+    "insuranceDealNr": 2
   },
   {
-    regNr: "AD 46 784",
-    brand: "Citroen",
-    model: "Berlingo",
-    modelYear: 2008,
-    propellant: "Benzin",
-    kmDriven: 80000,
-    monthlyPrice: 3000,
-    available: true
+    "orderDate": "2025-09-18",
+    "startDate": "2025-09-19",
+    "endDate": "2025-11-28",
+    "active": false,
+    "pickupLocation": "Kolding",
+    "associatedCustommerId": "91",
+    "associatedRegNr": "fy 5592",
+    "pricePrMonth": 3000,
+    "insuranceDealNr": 4
   },
   {
-    regNr: "UG 23 317",
-    brand: "Hyundai",
-    model: "Kona",
-    modelYear: 2022,
-    propellant: "El",
-    kmDriven: 28000,
-    monthlyPrice: 6300,
-    available: true
-  },
-  {
-    regNr: "TP 68 117",
-    brand: "Kia",
-    model: "Niro",
-    modelYear: 2019,
-    propellant: "Hybrid",
-    kmDriven: 96000,
-    monthlyPrice: 5600,
-    available: true
+    "orderDate": "2025-12-03",
+    "startDate": "2025-12-04",
+    "endDate": "2026-02-18",
+    "active": true,
+    "pickupLocation": "Aarhus",
+    "associatedCustommerId": "15",
+    "associatedRegNr": "jh 2209",
+    "pricePrMonth": 3700,
+    "insuranceDealNr": 1
   }
 ]);

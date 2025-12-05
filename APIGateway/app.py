@@ -11,7 +11,8 @@ services = {
     "customer-managment-service": "temp:5005",
     "subscription-managment-service": "temp:5006",
     "payment-service": "temp:5007",
-    "subscription-management-service": "http://subscription-management-service:5008"
+    "subscription-management-service": "http://subscription-management-service:5008",
+    "customer-management-service": "http://customer-management-service:5009"
 }
 
 app = Flask(__name__)
@@ -37,7 +38,7 @@ def getAuthToken():
         data=request.get_data() # body hedder i flask data
     )
 
-    data = response.json()
+    # data = response.json()
 
     return response.content
 
@@ -63,6 +64,7 @@ def lyskryds(service, path):
         headers=dict(request.headers), # vi omformaterer fordi req-headersne har formatet flak-header, men headers argumentet forventer dict
         params=request.args,
         data=request.get_data(), # IKKE JSON=GET_JSON() >:(
+
     )
 
     clientResponse = Response(
@@ -72,7 +74,6 @@ def lyskryds(service, path):
         )
 
     return clientResponse
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
