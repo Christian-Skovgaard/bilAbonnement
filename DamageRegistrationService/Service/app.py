@@ -3,27 +3,28 @@ import pymongo
 
 myclient = pymongo.MongoClient("mongodb://damage-registrations-db:27017")
 mydb = myclient["damage-registrations-db"] # Choose database "car-catalog-db"
-mycol = mydb["registrations"] # Choose collection
+mycol = mydb["damageCases"] # Choose collection
 
 app = Flask(__name__)
 
-# Get all registrations
-@app.route('/registrations', methods=['GET'])
-def get_registrations():
-    cursor = mycol.find({}, {"_id": 0}) # Query and remove MongoDB _id (surpress_id)
-    registrations = list(cursor)
-    return jsonify(registrations)
+# Get all damageCases
+@app.route('/damageCases', methods=['GET'])
+def get_damageCases():
+    cursor = mycol.find({}, {"_id": 0})
+    damageCases = list(cursor)
+    return jsonify(damageCases)
 
-# Get queried registrations
-@app.route('/registrations/<regnr>/query', methods=['GET'])
-def search_registrations_by_regnr(regnr):
+#Search damageCases med regNr
+@app.route('/damageCases/<regnr>/query', methods=['GET'])
+def search_damageCases(regnr):
+    trimmedRegNr = regnr.replace(" ", "") 
+
     queryParams = request.args
-    query = [{"regNr": regnr}]  # Start med regnr som filter
+    query = [{"regNr": trimmedRegNr}]  
 
-    # Tilføj yderligere query-parametre, hvis de ikke er tomme
     for key, value in queryParams.items():
         if value != "":
-            query.append({key: value})
+            query.append({ key: { "$regex": value, "$options": "i" } })
 
     if query:
         mongo_filter = {"$and": query}
@@ -31,9 +32,9 @@ def search_registrations_by_regnr(regnr):
         mongo_filter = {}
 
     cursor = mycol.find(mongo_filter, {"_id": 0})
-    registrations = list(cursor)
-    return jsonify(registrations)
-
+    damageCases = list(cursor)
+    return jsonify(damageCases)
+"""
 #POST complaints
 @app.route('/registrations', methods=['POST']) 
 def add_registrations():
@@ -45,10 +46,30 @@ def add_registrations():
         "message": "Complaint added",
         "inserted_id": str(cursor.inserted_id)
     }), 201
+"""
+#POST på RegNr
+@app.route('/damageCases/<regNr>', methods=['POST'])
+def add_damagecase(regNr):
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No JSON body provided"}), 400
 
-#PUT registrations med caseId 
-@app.route('/registrations/<int:caseId>', methods=['PUT'])
-def update_registrations(caseId):
+    data["regNr"] = regNr
+
+    cursor = mycol.insert_one(data)
+
+    return jsonify({
+        "message": "Damagecase added",
+        "regNr": regNr,
+        "inserted_id": str(cursor.inserted_id)
+    }), 201
+
+
+
+
+#PUT damageCases med caseId 
+@app.route('/damageCases/<int:caseId>', methods=['PUT'])
+def update_damageCases(caseId):
     data = request.get_json()
 
     if not data:

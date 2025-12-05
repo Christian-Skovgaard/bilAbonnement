@@ -141,12 +141,12 @@ def getAllComplaints():
     response = requests.get(f"{CUSTOMER_SERVICE}/complaints")
     return jsonify(response.json()), response.status_code
 
-@app.route('/registrations', methods=['GET'])
+@app.route('/damageCases', methods=['GET'])
 def getAllregistrations():
 
     # response = requests.get("http://customer-support-service:5003/complaints")
 
-    response = requests.get(f"{DAMAGE_REGISTRATION_SERVICE}/registrations")
+    response = requests.get(f"{DAMAGE_REGISTRATION_SERVICE}/damageCases")
     return jsonify(response.json()), response.status_code
 
 
