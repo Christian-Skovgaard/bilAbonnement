@@ -23,6 +23,7 @@ db.createCollection("tasks", {
             },
             assignedTo: {
                 bsonType: "string",
+                enum: ["Reception", "Inspection", "Salesmen"],
                 description: "must be a string representing the user assigned to the task"
             },
             dueDate: {
@@ -41,21 +42,21 @@ db.tasks.insertMany([
     title: "Design Database Schema",
     description: "Create the initial database schema for the project.",
     status: "in-progress",
-    assignedTo: "andreas",
+    assignedTo: "Reception",
     dueDate: new Date("2025-05-12")
     },
     {
     title: "Implement Authentication",
     description: "Set up user authentication and authorization.",
     status: "pending",
-    assignedTo: "Falske Andreas",
+    assignedTo: "Inspection",
     dueDate: new Date("2025-05-20")
     },
     {
     title: "Set Up CI/CD Pipeline",
     description: "Configure continuous integration and deployment pipeline.",
     status: "completed",
-    assignedTo: "andreas",
+    assignedTo: "Salesmen",
     dueDate: new Date("2025-04-30")
     }
 ]);
