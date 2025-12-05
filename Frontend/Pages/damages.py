@@ -101,8 +101,12 @@ with damagesRight:
         with idHeaderCol:
             st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
         with deleteCol:
-            if st.button("Slet", type="primary"): # Slet skadesrapport funktionalitet.
-                st.write("Hi :3")
+            if st.button("Slet", type="primary"):
+                removalResponse = requests.delete(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", headers={"Authorization": controller.get("Authorization")})
+                if removalResponse.status_code == 200:
+                    st.rerun()
+                else:
+                    st.write("Fejl!") # Dette 
     elif "damageRegNr" in st.session_state:
         st.subheader("Tilføj skadesrapport")
     else:
@@ -117,22 +121,24 @@ with damagesRight:
                 if st.button("Gem ændringer"): # PUT funktionalitet. Knap kan evt. dukke op, når et text_input er blevet ændret.
                     st.write("Hi :3")
             else: # Reg. nr. valgt, men ikke specifik skadesrapport.
-                for something in dataframe.items():
-                    if something[0] != "_id":
-                        st.text_input(label=something[0].title(), placeholder=f"Indtast {something[0]}", key=f"input{something[0]}")
-                    
-                if st.button("Tilføj"):
-                    addDamageBody = {}
+                if len(dataframe) == 0: # Ingen skadesrapporter på reg. nr.
+                    st.write("Ingen skadesrapporter på reg. nr.")
+                else:
                     for something in dataframe.items():
                         if something[0] != "_id":
-                            addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
-                    response = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
-                    st.rerun()
+                            st.text_input(label=something[0].title(), placeholder=f"Indtast {something[0]}", key=f"input{something[0]}")
+                    if st.button("Tilføj"):
+                        addDamageBody = {}
+                        for something in dataframe.items():
+                            if something[0] != "_id":
+                                addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
+                        response = requests.post(f"http://localhost:5001/damage-registration-service/cases/{addDamageBody["regNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
+                        st.rerun()
         else: # Reg. nr. ikke valgt.
             damageRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer")
             if st.button("Find skadesrapporter"):
                 findResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
-                if len(findResponse.json()) == 1: # Hvis præcis et resultat findes, vis skadesrapporter for gældende reg. nr.
+                if len(findResponse.json()) == 1: # Hvis præcis 1 resultat findes, vis skadesrapporter for gældende reg. nr.
                     st.session_state["damageRegNr"] = findResponse.json()[0]["regNr"]
                     st.rerun()
                 elif len(findResponse.json()) > 1:
