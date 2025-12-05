@@ -47,7 +47,7 @@ def createSubscription():
 
     # her skal customer service måske også informeres eller updates
 
-    if True    # today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
+    if True:    # today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
         subStartResp = tasks.onSubscriptionStart(subObj)    # i så fald kører de tasks som skal kører ved subscription start
 
         if not subStartResp["success"]:
