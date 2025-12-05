@@ -11,7 +11,8 @@ services = {
     "customer-managment-service": "temp:5005",
     "subscription-managment-service": "temp:5006",
     "payment-service": "temp:5007",
-    "subscription-management-service": "http://subscription-management-service:5008"
+    "subscription-management-service": "http://subscription-management-service:5008",
+    "customer-management-service": "http://subscription-management-service:5008"
 }
 
 app = Flask(__name__)

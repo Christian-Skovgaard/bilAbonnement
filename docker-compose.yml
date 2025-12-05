@@ -127,6 +127,33 @@ services:
     ports:
       - "27021:27017" # Map the container port to the host port
     networks:
+      - micro-
+    
+  customer-management-service:
+    container_name: customer-management-service
+    build:
+      context: ./CustomerManagementService/Service # Use the local directory as the build context
+      dockerfile: Dockerfile # Use the Dockerfile in the local directory
+    ports:
+      - "5009:5009" # Map the container port to the host port
+    environment:
+      MONGO_URI: "mongodb://customer-management-db:27017/customerDB" # Use the service name as the hostname
+    volumes:
+      - ./CustomerManagementService/Service:/app # Mount the local directory to the container
+    depends_on:
+      - customer-service-db # Wait for the mongo service to be ready
+    networks:
+      - micro-net  
+
+  customer-management-db:
+    container_name: customer-management-db
+    image: mongo:latest # Use the latest MongoDB image
+    volumes:
+      - customer-management-db:/data/db # Persist the data locally
+      - ./CustomerManagementService/Database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "27021:27017" # Map the container port to the host port
+    networks:
       - micro-net
 
 
