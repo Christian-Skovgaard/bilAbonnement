@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from bson import ObjectId
 from bson.errors import InvalidId
+from bson import Regex
 import dbUtil as db
 import serviceTasks as tasks
 import pymongo
@@ -46,7 +47,7 @@ def createSubscription():
 
     # her skal customer service måske også informeres eller updates
 
-    if today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
+    if True    # today == datetime.datetime.strptime(subObj["startDate"], "%Y-%m-%d").date():  # vi ser om startday er i dag
         subStartResp = tasks.onSubscriptionStart(subObj)    # i så fald kører de tasks som skal kører ved subscription start
 
         if not subStartResp["success"]:
@@ -100,20 +101,23 @@ def get_subscription(sub_id):
 
     return jsonify(sub), 200
 
+@app.route('/subscriptions/query', methods=['GET']) # Skal kunne tage højde for, om pris er INDEN FOR monthlyMin og monthlyMax
+def search_cars():
+    queryParams = request.args # Dict of query parameters
+    query = []
 
-@app.route('/dostuff', methods=['GET'])
-def stuff():
+    for key, value in queryParams.items():
+        if value != "":
+            query.append({key: Regex(value, "i")}) # # Lav en liste af objekter til query ud fra query params f.eks.: [{brand : "Toyota"}, {model : "GT86"}]
 
-    data = {
-        "yes": "baby"
-    }
+    if query:
+        mongo_filter = {"$and": query} # Request parameters given.
+    else:
+        mongo_filter = {}  # No request parameters given / empty request parameters like: ?brand=&model=
 
-    resp = db.insertSubscription(data)
-
-    print(resp)
-
-    return jsonify("ok")
-
+    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
+    subs = list(cursor)
+    return jsonify(subs)
 
 @app.route('/test', methods=['GET'])
 def test():
