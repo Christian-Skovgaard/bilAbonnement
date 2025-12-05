@@ -6,8 +6,12 @@ db.createCollection("tasks", {
   validator: {
     $jsonSchema: {
         bsonType: "object",
-        required: ["title", "description", "status", "assignedTo", "dueDate"],
+        required: ["title", "description", "status", "assignedTo"],
+        additionalProperties: false,
         properties: {
+            _id: {
+                bsonType: "objectId"
+            },
             title: {
                 bsonType: "string",
                 description: "must be a string and is required"
@@ -25,10 +29,6 @@ db.createCollection("tasks", {
                 bsonType: "string",
                 enum: ["Reception", "Inspection", "Salesmen"],
                 description: "must be a string representing the user assigned to the task"
-            },
-            dueDate: {
-                bsonType: "date",
-                description: "must be a date and is required"
             }
         }
     }
@@ -42,21 +42,18 @@ db.tasks.insertMany([
     title: "Design Database Schema",
     description: "Create the initial database schema for the project.",
     status: "in-progress",
-    assignedTo: "Reception",
-    dueDate: new Date("2025-05-12")
+    assignedTo: "Reception"
     },
     {
     title: "Implement Authentication",
     description: "Set up user authentication and authorization.",
     status: "pending",
-    assignedTo: "Inspection",
-    dueDate: new Date("2025-05-20")
+    assignedTo: "Inspection"
     },
     {
     title: "Set Up CI/CD Pipeline",
     description: "Configure continuous integration and deployment pipeline.",
     status: "completed",
-    assignedTo: "Salesmen",
-    dueDate: new Date("2025-04-30")
+    assignedTo: "Salesmen"
     }
 ]);

@@ -48,6 +48,27 @@ def update_task_status(task_id):
         return jsonify({"error": "Task not found"}), 404
     return jsonify({"message": "Task status updated successfully"})
 
+#Change task details by id
+@app.route('/tasks/<task_id>', methods=['PUT'])
+def update_task_details(task_id):
+    task_data = request.json
+    result = tasks_collection.update_one(
+        {"_id": ObjectId(task_id)},
+        {"$set": task_data}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Task not found"}), 404
+    
+    updated_task = tasks_collection.find_one({"_id": ObjectId(task_id)}, {"_id": 0})
+    return jsonify(updated_task)
+
+# Delete a task
+@app.route('/tasks/<task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    result = tasks_collection.delete_one({"_id": ObjectId(task_id)})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Task not found"}), 404
+    return jsonify({"message": "Task deleted"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5010)
