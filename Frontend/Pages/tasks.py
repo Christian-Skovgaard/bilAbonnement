@@ -21,7 +21,7 @@ with col2:
         st.switch_page("login.py")
 
 with st.container(border=True):
-    carsPageBtn, damageRegiBtn, dealershipBtn, subscriptionsBtn, customerSuppBtn = st.columns(5)
+    carsPageBtn, damageRegiBtn, tasksBtn, subscriptionsBtn, customerSuppBtn = st.columns(5)
     with carsPageBtn:
         if st.button(label="Biler"):
             st.switch_page("pages/cars.py")
@@ -30,8 +30,8 @@ with st.container(border=True):
         if st.button(label="Skader"):
             st.switch_page("pages/damages.py")
 
-    with dealershipBtn:
-        if st.button(label="Forhandler", type="primary"):
+    with tasksBtn:
+        if st.button(label="Opgaver", type="primary"):
             st.query_params = {}
             st.rerun()
 
