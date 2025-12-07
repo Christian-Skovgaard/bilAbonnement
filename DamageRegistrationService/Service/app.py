@@ -55,6 +55,7 @@ def add_case(regNr):
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
 
+    # Ensure regNr is always set from URL
     data["regNr"] = regNr
 
     cursor = mycol.insert_one(data)
@@ -64,6 +65,7 @@ def add_case(regNr):
         "regNr": regNr,
         "inserted_id": str(cursor.inserted_id)
     }), 201
+
 
 #PUT damageCases med caseId 
 @app.route('/cases/<caseId>', methods=['PUT'])

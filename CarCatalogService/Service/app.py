@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import pymongo
 from bson import Regex
+from datetime import datetime
 
 myclient = pymongo.MongoClient("mongodb://car-catalog-db:27017")
 mydb = myclient["car-catalog-db"] # Choose database "car-catalog-db"
@@ -75,14 +76,44 @@ def get_cars_by_price():
     cars = list(cursor)
     return jsonify(cars)
 
-
 # Add a new car
 @app.route('/cars', methods=['POST'])
 def add_car():
     data = request.get_json(force=True)
-    cursor = mycol.insert_one(data)
+
+    # Insert into CarCatalog DB
+    cursor = cars.insert_one(data)
+
     # convert ObjectId to string for JSON serialization
-    data['_id'] = str(cursor.inserted_id)
+    data["_id"] = str(cursor.inserted_id)
+
+    # Build damage record payload (only required fields)
+    damage_payload = {
+        "regNr": data["regNr"],
+        "car": data["brand"],
+        "model": data["model"],
+        "modelYear": data["modelYear"],
+        "damage_status": "None",
+        "date": str(datetime.utcnow().strftime("%Y-%m-%d"))
+    }
+
+    try:
+        # Call DamageRegistrationService using regNr in URL
+        regNr = data["regNr"]
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+
+        resp = requests.post(
+            f"http://localhost:5005/cases/{regNr}",
+            json=damage_payload,
+            headers=headers
+        )
+        print(resp.status_code, resp.text)
+    except Exception as e:
+        print(f"Failed to notify DamageRegistrationService: {e}")
+
     return jsonify(data), 201
 
 # Change car details by regNr
