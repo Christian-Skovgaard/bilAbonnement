@@ -81,38 +81,19 @@ def get_cars_by_price():
 def add_car():
     data = request.get_json(force=True)
 
+    # Check if regNr already exists
+    existing_car = mycol.find_one({"regNr": data["regNr"]})
+    if existing_car:
+        return jsonify({
+            "error": "Car with this regNr already exists",
+            "regNr": data["regNr"]
+        }), 409  # HTTP 409 Conflict
+
     # Insert into CarCatalog DB
-    cursor = cars.insert_one(data)
+    cursor = mycol.insert_one(data)
 
     # convert ObjectId to string for JSON serialization
     data["_id"] = str(cursor.inserted_id)
-
-    # Build damage record payload (only required fields)
-    damage_payload = {
-        "regNr": data["regNr"],
-        "car": data["brand"],
-        "model": data["model"],
-        "modelYear": data["modelYear"],
-        "damage_status": "None",
-        "date": str(datetime.utcnow().strftime("%Y-%m-%d"))
-    }
-
-    try:
-        # Call DamageRegistrationService using regNr in URL
-        regNr = data["regNr"]
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
-
-        resp = requests.post(
-            f"http://localhost:5005/cases/{regNr}",
-            json=damage_payload,
-            headers=headers
-        )
-        print(resp.status_code, resp.text)
-    except Exception as e:
-        print(f"Failed to notify DamageRegistrationService: {e}")
 
     return jsonify(data), 201
 
