@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from mongoengine import connect, Document, StringField, IntField
+from bson import Regex
 
 import pymongo
 
@@ -22,10 +23,17 @@ def search_complaints():
     queryParams = request.args # Dict of query parameters
     query = []
 
-    for key, value in queryParams.items():
-        if value != "":
-            query.append({ key: { "$regex": value, "$options": "i" } }) # nice to have skriv "mag" og du får "magnus"
-
+    for key, value in queryParams.items():      
+        if value.lower() == ("true"): # Is boolean?
+            query.append({key: True})
+        elif value.lower() == ("false"):
+            query.append({key: False})
+        elif value.isdigit():
+            query.append({key: int(value)})
+        else: # Is string.
+            if queryParams[key] != "": # Ignorerer parametre som "cars/query?regNr=&model="
+                query.append({key: Regex(value, "i")})
+        
     if query:
         mongo_filter = {"$and": query} # Request parameters given.
     else:
