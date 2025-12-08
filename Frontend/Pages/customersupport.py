@@ -2,11 +2,23 @@ import streamlit as st
 from streamlit_cookies_controller import CookieController
 import pandas as pd
 import requests
+import jwt
 
 # Data
 cases = []
 
 controller = CookieController()
+
+try:
+    claims = jwt.decode(
+        controller.get("Authorization")[7:], # Fjern "bearer" fra cookie.
+        options={"verify_signature": False},
+        algorithms=["HS256"]
+    )
+except jwt.ExpiredSignatureError:
+    print("Token is expired (even without verification, PyJWT checks 'exp' claim)")
+except Exception as e:
+    print(f"An error occurred during decoding: {e}")
 
 
 # Logik
@@ -196,9 +208,12 @@ with customerSuppRight:
                 else:
                     st.write(f":red[Kunne ikke opdatere sagen. Statuskode: {updateResponse.status_code}]")
 
-    with tab4: # Mangler access control via. roles
-        with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.
-            removalMongoId = st.text_input(label="ID", placeholder="Indtast Id", key="removalMongoId")
+    with tab4:
+        if claims.get("role") != "admin":
+            st.warning("Du har ikke adgang til at slette sager.")
+        else:
+            with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.
+                removalMongoId = st.text_input(label="ID", placeholder="Indtast Id", key="removalMongoId")
 
             if st.button(label="Slet Sag", type="primary"):
                 removalResponse = requests.delete(f"http://localhost:5001/customer-support-service/complaints/{removalMongoId}", headers={"Authorization": controller.get("Authorization")})
