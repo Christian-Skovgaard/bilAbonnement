@@ -3,6 +3,9 @@ from streamlit_cookies_controller import CookieController
 import requests
 
 controller = CookieController()
+if "Authorization" in controller.getAll(): # Hvis du allerede er logget ind.
+    st.switch_page("pages/cars.py")
+st.query_params = {} # Hvis du er sendt tilbage til login skal alle query params fjernes.
 
 st.set_page_config(page_title="Log ind | Bilabonnement", page_icon="⏱️", layout="centered")
 
