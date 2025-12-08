@@ -6,7 +6,7 @@ db.createCollection("complaints");
 
 // Insert sample documents
 db.complaints.insertMany([
-  { complaintId: 1,
+  { 
     regNr: "XD69420", 
     name: "magnus", 
     date: "2020-01-10",
@@ -14,7 +14,7 @@ db.complaints.insertMany([
     completed: true
   },
 
-{   complaintId: 2,
+{   
     regNr: "XD69420", 
     name: "victor", 
     date: "2020-01-10",
