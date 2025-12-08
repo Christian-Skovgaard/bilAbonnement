@@ -125,8 +125,6 @@ services:
     volumes:
       - damage-registrations-db:/data/db # Persist the data locally
       - ./DamageRegistrationService/Database/init:/docker-entrypoint-initdb.d
-    ports:
-      - "27020:27017" # Map the container port to the host port
     networks:
       - micro-net  
 
