@@ -2,11 +2,23 @@ import streamlit as st
 from streamlit_cookies_controller import CookieController
 import pandas as pd
 import requests
+import jwt
 
 # Data
 controller = CookieController()
 
 damageCases = []
+
+try:
+    claims = jwt.decode(
+        controller.get("Authorization")[7:], # Fjern "bearer" fra cookie.
+        options={"verify_signature": False},
+        algorithms=["HS256"]
+    )
+except jwt.ExpiredSignatureError:
+    print("Token is expired (even without verification, PyJWT checks 'exp' claim)")
+except Exception as e:
+    print(f"An error occurred during decoding: {e}")
 
 # Logik
 try:
@@ -104,12 +116,13 @@ with damagesRight:
         with idHeaderCol:
             st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
         with deleteCol:
-            if st.button("Slet", type="primary"):
-                removalResponse = requests.delete(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", headers={"Authorization": controller.get("Authorization")})
-                if removalResponse.status_code == 200:
-                    st.rerun()
-                else:
-                    st.write("Fejl!") # Dette burde ikke blive set på grund af Streamlits skærm refresh.
+            if claims["role"] == "admin":
+                if st.button("Slet", type="primary"):
+                    removalResponse = requests.delete(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", headers={"Authorization": controller.get("Authorization")})
+                    if removalResponse.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.write("Fejl!") # Dette burde ikke blive set på grund af Streamlits skærm refresh.
     elif "damageRegNr" in st.session_state:
         st.subheader("Tilføj skadesrapport")
     else:
