@@ -19,3 +19,49 @@ def getData ():
     )
     customerJson = customerResp.json()
     
+    carResp = requests.request(
+        method="GET",
+        url="http://localhost:5001/car-catalog-service/cars",
+        headers={"Authorization": getAuthToken()},
+    )
+    carJson = carResp.json()
+
+    return {
+        "subList":subJson,
+        "customerList":customerJson,
+        "carList":carJson
+    }
+
+def joinLists(db1, db2, key1, key2):
+    result = []
+    for d1 in db1:
+        matched = False
+
+        for d2 in db2:
+            if d1.get(key1) == d2.get(key2):
+                combined = {**d1, **d2}
+                combined.pop(key1, None)
+                combined.pop(key2, None)
+                result.append(combined)
+                matched = True
+
+        # If nothing matched in db2, still output d1
+        if not matched:
+            result.append(d1.copy())
+
+    return result
+
+
+def getFormattedData ():
+    unformatedData = getData()
+    subCar = joinLists(
+        unformatedData["subList"],
+        unformatedData["carList"],
+        "associatedRegNr",
+        "regNr"
+        )
+    return subCar
+
+
+print(getFormattedData())
+
