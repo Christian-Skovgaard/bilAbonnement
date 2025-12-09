@@ -5,7 +5,7 @@ from bson.errors import InvalidId
 from bson import Regex
 
 myclient = pymongo.MongoClient("mongodb://customer-management-db:27017")
-mydb = myclient["customer-management-db"] 
+mydb = myclient["customerDB"] 
 mycol = mydb["customers"] # Choose collection
 
 app = Flask(__name__)

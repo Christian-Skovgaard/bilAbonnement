@@ -12,16 +12,20 @@ st.set_page_config(page_title="Oversigt | Bilabonnement", page_icon="⏱️", la
 
 # we defy session state!
 def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke fylder, har ikke noget praktisk formål
-    if "filterActive" not in st.session_state:
-        st.session_state.filterActive = ""
-    if "filterName" not in st.session_state:
-        st.session_state.filterName = ""
+    if "filteractive" not in st.session_state:
+        st.session_state.filteractive = True
+    if "filterfirstName" not in st.session_state:
+        st.session_state.filterfirstName = ""
+    if "filterlastName" not in st.session_state:
+        st.session_state.filterlastName = ""
     if "filterBrand" not in st.session_state:
         st.session_state.filterBrand = ""
     if "filterModel" not in st.session_state:
         st.session_state.filterModel = ""
-    if "filterLocation" not in st.session_state:
-        st.session_state.filterLocation = ""
+    if "filterregNr" not in st.session_state:
+        st.session_state.filterregNr = ""
+    if "filterpickupLocation" not in st.session_state:
+        st.session_state.filterpickupLocation = ""
     
 
     #create
@@ -49,8 +53,25 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
     if "createLocation" not in st.session_state:
         st.session_state.createLocation = ""
 
-    if "createMsg" not in st.session_state:
-        st.session_state.createMsg = ""
+    if "statusMsg" not in st.session_state:
+        st.session_state.statusMsg = ""
+
+    if "updateId" not in st.session_state:
+        st.session_state.updateId = ""
+    if "updateActive" not in st.session_state:
+        st.session_state.updateActive = ""
+    if "updateCustommerId" not in st.session_state:
+        st.session_state.updateCustommerId = ""
+    if "updateRegNr" not in st.session_state:
+        st.session_state.updateRegNr = ""
+    if "updatePricePrMonth" not in st.session_state:
+        st.session_state.updatePricePrMonth = ""
+    if "updatePickupLocation" not in st.session_state:
+        st.session_state.updatePickupLocation = ""
+    if "updateStartDate" not in st.session_state:
+        st.session_state.updateStartDate = ""
+    if "updateEndDate" not in st.session_state:
+        st.session_state.updateEndDate = ""
 defSessionState()
 
 def getAuthToken():
@@ -96,21 +117,34 @@ def onCreateClick():
         }
     )
     jsonResp = resp.json()
-    st.session_state["createMsg"]["msg"] = jsonResp
+    st.session_state["statusMsg"]["msg"] = jsonResp
     
+def onUpdateClick():
+    None
 
-# get data
-resp = requests.request(
-    method="GET",
-    url="http://localhost:5001/subscription-management-service/subscriptions/query",
-    headers={"Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDg4OTE4MSwianRpIjoiNDE2MGQwODQtYzI4Yy00NmVlLWI0MmItMDlkYzQ3N2ZhZDNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IkJvIiwibmJmIjoxNzY0ODg5MTgxLCJjc3JmIjoiODJiYzVkZDItZmVjOC00NGNiLWFkOTQtZDI3NThjZGE3ZmU1IiwiZXhwIjoxNzcwMDczMTgxLCJyb2xlIjoiYWRtaW4iLCJkZXBhcnRtZW50IjoiS29saW5nIn0.ervCIhnk4iyzZNB4DpuU4IvrtMttntWcdcrvytnUrfauFuGqvPm6_nqH0Ps45gCqhCIUI3YUQti7jk3JTiLsA4L8RFhYOdaFv6LrYjACHINtl6Q1XO5IJTlSAGsuWc3EiWrvpHRfUvDB5-8n6xRNa5qEdwEToZofjcvYrxCuWsZ067rNYVumWR6e9oAOc7IUFHcC_L1vYGwti2SbB8XJAxxkdJc3Zr8YTOD9EBscal1pOOdznRHR4pS3QUUDIpJJxBssINq1wClaS9_8zPYhTW4eMgeq3NDVoqtwaW7y7cwG5BXNIhyicRGD-WD33oAklHr2Ess8wfNrmSs-Ozp-WA"},
-    params={
-        "associatedCustommerId":st.session_state["filterName"],
-        "associatedRegNr":st.session_state["filterBrand"],
-        "pickupLocation":st.session_state["filterLocation"]
-        }
-)
-json = resp.json()
+def onUpdateIdChange():
+    subId = st.session_state.updateId
+
+    resp = requests.request(
+        method="GET",
+        url=f"http://localhost:5001/subscription-management-service/subscriptions/{subId}",
+        headers={"Authorization": getAuthToken()}
+    )
+    json = resp.json()
+
+    if json.get("error"):
+        st.session_state["statusMsg"] = json["error"]
+    else:
+        st.session_state["updateActive"] = json["active"]
+        st.session_state["updateCustommerId"] = json["associatedCustomerId"]
+        st.session_state["updateRegNr"] = json["associatedRegNr"]
+        st.session_state["updatePricePrMonth"] = str(json["pricePrMonth"]) # det er et tal, 
+        st.session_state["updatePickupLocation"] = json["pickupLocation"]
+        st.session_state["updateStartDate"] = json["startDate"]
+        st.session_state["updateEndDate"] = json["endDate"]
+        
+
+    
 
 def getData ():
 
@@ -152,12 +186,10 @@ def joinLists(db1, db2, key1, key2):
                 result.append(combined)
                 matched = True
 
-        # If nothing matched in db2, still output d1
         if not matched:
             result.append(d1.copy())
 
     return result
-
 
 def getFormattedData ():
     unformatedData = getData()
@@ -167,21 +199,51 @@ def getFormattedData ():
         "associatedRegNr",
         "regNr"
         )
+    formatedSubCar = renameKey(subCar,"_id","subscription ID")
     subCarCustomer = joinLists(
-        unformatedData["subList"],
+        formatedSubCar,
         unformatedData["customerList"],
         "associatedCustomerId",
-        "regNr"
+        "customerId"
         )
-    return subCar
+    return subCarCustomer
 
+def renameKey(list_of_dicts, old_key, new_key):
+    new_list = []
+    for d in list_of_dicts:
+        if old_key in d:
+            d[new_key] = d.pop(old_key)
+        new_list.append(d)
+    return new_list
+
+def extract_filters(input_dict):
+    result = {}
+    for key, value in input_dict.items():
+        if key.startswith("filter") and value:
+            # Remove 'filter' prefix
+            new_key = key[len("filter"):] if key != "filter" else ""
+            if new_key:  # Only add if new_key is not empty
+                result[new_key] = value
+    return result
+
+def filter_dataframe(df, filter_dict):
+    mask = pd.Series(True, index=df.index)
+    for key, value in filter_dict.items():
+        if isinstance(value, list):
+            mask &= df[key].isin(value)
+        else:
+            mask &= (df[key] == value)
+    return df[mask]
 
 data = getFormattedData()
 
-
 df = pd.DataFrame(data)
 
-# df = df[["active","startDate","endDate","brand","model"]]
+filter = extract_filters(st.session_state)
+
+filterdDF = filter_dataframe(df,filter)
+
+filterdDF = filterdDF[["active","startDate","endDate","firstName","lastName","brand","model","regNr","pricePrMonth","pickupLocation","orderDate","customerId","subscription ID"]]
 
 
 col1, col2 = st.columns([5,1], vertical_alignment="center")
@@ -225,7 +287,7 @@ subLeft, subRight = st.columns([6,4])
 with subLeft:
     st.subheader("Oversigt over Abonnetmenter")
     with st.container(border=True): # Dataframe opdateres ved hver ændring i text_input eller button presses.
-        st.dataframe(df, hide_index=True)
+        st.dataframe(filterdDF, hide_index=True)
 
 with subRight:
     carRightTitle = st.subheader("Kontrolpanel")
@@ -233,17 +295,19 @@ with subRight:
 
     with tab1:
         with st.container(border=True): # filterer
-            filterActive = st.checkbox(label="Kun aktive", key="filterAktive", value=True)
-
-            filterName = st.text_input(label="Navn", placeholder="id", key="filterName")
+            filteractive = st.checkbox(label="Kun aktive", key="filteractive", value=True)
             
-            brand, model = st.columns(2)
-            with brand:
-                filterBrand = st.text_input(label="Bilmærke", placeholder="temp reg nr", key="filterBrand")
-            with model:
+            filterRight, filterLeft = st.columns(2)
+            with filterRight:
+                filterfirstName = st.text_input(label="Fornavn", key="filterfirstName")
+                filterBrand = st.text_input(label="Bilmærke", key="filterBrand")
+                filterregNr = st.text_input(label="Reg Nr", key="filterregNr")
+            with filterLeft:
+                filterlastName = st.text_input(label="Efternavn", key="filterlastName")
                 filterModel = st.text_input(label="Model", key="filterPropellant")
+                filterpickupLocation = st.selectbox(label="Afhentnings sted", options=("","Aarhus", "Kolding", "København"), key="filterpickupLocation")
 
-            filterLocation = st.text_input(label="lokation", key="filterLocation")
+            
 
     with tab2:
         with st.container(border=True):
@@ -274,5 +338,23 @@ with subRight:
 
             st.button(label="opret!",on_click=onCreateClick)
 
-    if st.session_state["createMsg"] != "":
-        st.write(st.session_state["createMsg"])
+    with tab3:
+        updateId = st.text_input(label="Subscription Id", key="updateId", value=st.session_state.updateId, on_change=onUpdateIdChange)
+
+        if st.session_state.updateId != "":
+
+            updateActive = st.checkbox(label="aktiv", key="updateActive", value=st.session_state.updateActive)
+
+            updateLeft, updateRight = st.columns(2)
+            with updateLeft:
+                updateCustommerId = st.text_input(label="Subscription Id", key="updateCustommerId", value=st.session_state.updateCustommerId)
+                updatePricePrMonth = st.text_input(label="updatePricePrMonth", key="updatePricePrMonth", value=st.session_state.updatePricePrMonth)
+                updateStartDate = st.text_input(label="updateStartDate", key="updateStartDate", value=st.session_state.updateStartDate)
+            with updateRight:
+                updateRegNr = st.text_input(label="updateRegNr", key="updateRegNr", value=st.session_state.updateRegNr)
+                updatePickupLocation = st.text_input(label="updatePickupLocation", key="updatePickupLocation", value=st.session_state.updatePickupLocation)
+                updateEndDate = st.text_input(label="updateEndDate", key="updateEndDate", value=st.session_state.updateEndDate)
+
+
+    if st.session_state["statusMsg"] != "":
+        st.write(st.session_state["statusMsg"])

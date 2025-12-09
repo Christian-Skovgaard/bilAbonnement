@@ -63,5 +63,5 @@ def getFormattedData ():
     return subCar
 
 
-print(getFormattedData())
+print(getData()["customerList"])
 
