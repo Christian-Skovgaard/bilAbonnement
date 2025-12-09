@@ -3,6 +3,9 @@ from streamlit_cookies_controller import CookieController
 import requests
 
 controller = CookieController()
+if "Authorization" in controller.getAll(): # Hvis du allerede er logget ind.
+    st.switch_page("pages/cars.py")
+st.query_params = {} # Hvis du er sendt tilbage til login skal alle query params fjernes.
 
 st.set_page_config(page_title="Log ind | Bilabonnement", page_icon="⏱️", layout="centered")
 
@@ -19,6 +22,7 @@ with st.container(border=True):
 
         if "access_token" in response.json():
             controller.set("Authorization", f"Bearer {response.json()["access_token"]}")
+            st.session_state["username"] = username
             st.switch_page("pages/cars.py")
         else:
             st.write(f":red[{response.json()["error"]}]")

@@ -61,8 +61,10 @@ col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
 
+user = st.session_state["username"] or "Guest"
+
 with col2:
-    st.subheader("Hej Victor!")
+    st.subheader(f"Hej {user}!")
     if st.button(label="Log ud"):
         if "Authorization" in controller.getAll():
             controller.remove("Authorization")
@@ -79,6 +81,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.switch_page("pages/damages.py")
 
     with tasksBtn:

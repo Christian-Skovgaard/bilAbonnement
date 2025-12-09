@@ -1,5 +1,6 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 import pymongo
+from bson.objectid import ObjectId
 
 myclient = pymongo.MongoClient("mongodb://damage-registration-db:27017")
 mydb = myclient["damage-registration-db"] # Choose database "car-catalog-db"
@@ -19,9 +20,20 @@ def get_cases():
         damageCases.append(doc)
     return jsonify(damageCases)
 
-#Search damageCases med regNr
-@app.route('/cases/<regnr>/query', methods=['GET'])
+# Find damageCases for regNr
+@app.route('/cases/<regnr>', methods=['GET'])
 def get_cases_by_regnr(regnr):
+    cursor = mycol.find({"regNr" : regnr})
+    damageCases = []
+    for doc in cursor:
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
+    return jsonify(damageCases)
+
+# Query damageCases med regNr
+@app.route('/cases/<regnr>/query', methods=['GET'])
+def query_by_regnr(regnr):
     queryParams = request.args
     query = [{"regNr": regnr}]
     for key, value in queryParams.items():
@@ -43,6 +55,7 @@ def add_case(regNr):
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
 
+    # Ensure regNr is always set from URL
     data["regNr"] = regNr
 
     cursor = mycol.insert_one(data)
@@ -53,25 +66,35 @@ def add_case(regNr):
         "inserted_id": str(cursor.inserted_id)
     }), 201
 
+
 #PUT damageCases med caseId 
-@app.route('/cases/<int:caseId>', methods=['PUT'])
+@app.route('/cases/<caseId>', methods=['PUT'])
 def update_case(caseId):
     data = request.get_json()
 
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
     
-    data.pop("_id", None)
-
     cursor = mycol.update_one(
-        {"caseId": caseId},
+        {"_id": ObjectId(caseId)},
         {"$set": data}
     )
 
     if cursor.matched_count == 0:
-        return jsonify({"error": "Complaint not found"}), 404
+        return jsonify({"error": "Case not found"}), 404
 
-    return jsonify({"message": "Complaint updated"}), 200
+    return jsonify({"message": "Case updated"}), 200
+
+# DELETE damageCase på caseId 
+@app.route('/cases/<caseId>', methods=['DELETE'])
+def delete_case(caseId):
+    result = mycol.delete_one({"_id": ObjectId(caseId)})
+
+    # Check if any document was actually deleted
+    if result.deleted_count == 0:
+        abort(404, description=f"Case with ID {caseId} not found.")
+
+    return jsonify({"message": f"Case with ID {caseId} deleted"})
 
 
 if __name__ == '__main__':
