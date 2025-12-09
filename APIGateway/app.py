@@ -11,7 +11,8 @@ services = {
     "damage-registration-service" : "http://damage-registration-service:5005",
     "payment-service": "temp:5007",
     "subscription-management-service": "http://subscription-management-service:5008",
-    "customer-management-service": "http://customer-management-service:5009"
+    "customer-management-service": "http://customer-management-service:5009",
+    "task-management-service": "http://task-management-service:5010"
 }
 
 

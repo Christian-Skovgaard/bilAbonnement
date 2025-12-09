@@ -21,9 +21,9 @@ def get_cases():
     return jsonify(damageCases)
 
 # Find damageCases for regNr
-@app.route('/cases/<regnr>', methods=['GET'])
-def get_cases_by_regnr(regnr):
-    cursor = mycol.find({"regNr" : regnr})
+@app.route('/cases/<regNr>', methods=['GET'])
+def get_cases_by_regnr(regNr):
+    cursor = mycol.find({"regNr" : regNr})
     damageCases = []
     for doc in cursor:
         if "_id" in doc:
@@ -32,10 +32,10 @@ def get_cases_by_regnr(regnr):
     return jsonify(damageCases)
 
 # Query damageCases med regNr
-@app.route('/cases/<regnr>/query', methods=['GET'])
-def query_by_regnr(regnr):
+@app.route('/cases/<regNr>/query', methods=['GET'])
+def query_by_regnr(regNr):
     queryParams = request.args
-    query = [{"regNr": regnr}]
+    query = [{"regNr": regNr}]
     for key, value in queryParams.items():
         if value != "":
             query.append({key: {"$regex": value, "$options": "i"}})
@@ -85,7 +85,7 @@ def update_case(caseId):
 
     return jsonify({"message": "Case updated"}), 200
 
-# DELETE damageCase på caseId 
+# DELETE damageCase på caseId
 @app.route('/cases/<caseId>', methods=['DELETE'])
 def delete_case(caseId):
     result = mycol.delete_one({"_id": ObjectId(caseId)})

@@ -3,6 +3,7 @@ from streamlit_cookies_controller import CookieController
 import pandas as pd
 import requests
 import jwt
+import numpy as np
 
 # Data
 controller = CookieController()
@@ -139,17 +140,29 @@ with damagesRight:
                     if damageKey != "_id":
                         st.text_input(label=damageKey.title(), placeholder=f"Indtast {damageKey}", value=damageValue, key=f"update{damageKey}")
                 if st.button("Gem ændringer"): # PUT funktionalitet. Knap kan evt. dukke op, når et text_input er blevet ændret.
-                    updateBody = {}
                     updateDamageBody = {}
-                    st.write(st.session_state.damageDetails.items())
-                    for something in st.session_state.damageDetails.items():
-                        if something[0] != "_id":
-                            updateDamageBody[str(something[0])] = st.session_state[f"update{something[0]}"]
+                    for key, original_value in st.session_state.damageDetails.items():   # AI kode. Alt muligt Numpy gøgl jeg ikke gider sidde med.
+                        if key == "_id":
+                            continue
+                        raw = st.session_state.get(f"update{key}", "")
+
+                        # If the original value was a numpy integer, coerce the input to int
+                        if isinstance(original_value, (np.integer,)):
+                            try:
+                                updateDamageBody[key] = int(raw)
+                            except Exception:
+                                updateDamageBody[key] = raw
+                        else:
+                            # Try to convert numeric strings to ints (safe fallback)
+                            try:
+                                updateDamageBody[key] = int(raw)
+                            except Exception:
+                                updateDamageBody[key] = raw   # AI kode slut. Alt muligt Numpy gøgl jeg ikke gider sidde med.
                     updateResponse = requests.put(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", json=updateDamageBody, headers={"Authorization": controller.get("Authorization")})
                     if updateResponse.status_code == 200:
                         st.rerun()
                     else:
-                        st.write(f"Case kunne ikke blive opdateret. Statuskode: {updateResponse.status_code}")
+                        st.write(f":red[Case kunne ikke blive opdateret. Statuskode: {updateResponse.status_code}]")
             else: # Reg. nr. valgt, men ikke specifik skadesrapport.
                 if len(dataframe) == 0: # Ingen skadesrapporter på reg. nr.
                     st.write("Ingen skadesrapporter på reg. nr.")

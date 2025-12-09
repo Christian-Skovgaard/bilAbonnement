@@ -19,8 +19,6 @@ services:
     build:
       context: ./CarCatalogService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5002:5002" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog-db" # Use the service name as the hostname
     volumes:
@@ -44,8 +42,6 @@ services:
     build:
       context: ./AuthorizationService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5004:5004" # Map the container port to the host port
     volumes:
       - ./AuthorizationService/Service:/app # Mount the local directory to the container
     depends_on:
@@ -72,8 +68,6 @@ services:
     build:
       context: ./CustomerSupportService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5003:5003" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://customer-service-db:27019/customer-service-db" # Use the service name as the hostname
     volumes:
@@ -98,8 +92,6 @@ services:
     build:
       context: ./DamageRegistrationService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5005:5005" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://damage-registration-db:27017/damage-registration-db" # Use the service name as the hostname
     volumes:
@@ -123,8 +115,6 @@ services:
     build:
       context: ./SubscriptionManagementService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5008:5008" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://subscription-management-db:27017/subscriptionDB" # Use the service name as the hostname
     volumes:
@@ -148,8 +138,6 @@ services:
     build:
       context: ./CustomerManagementService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5009:5009" # Map the container port to the host port
     environment:
       MONGO_URI: "mongodb://customer-management-db:27017/customerDB" # Use the service name as the hostname
     volumes:
@@ -173,8 +161,6 @@ services:
     build:
       context: ./TaskManagementService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    ports:
-      - "5010:5010" # Map the container port to the host port
     environment: 
       MONGO_URI: "mongodb://task-management-db:27020/task-management-db" # Use the service name as the hostname
     volumes:
@@ -196,9 +182,9 @@ services:
 
 volumes:
   car-catalog-db:
-    driver: local # Use the local volume driver
+    driver: local
   authorization-db:
-    driver: local # Use the local volume driver
+    driver: local
   customer-service-db:
     driver: local
   customer-management-db:
