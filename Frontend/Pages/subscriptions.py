@@ -76,6 +76,7 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
 defSessionState()
 
 def getAuthToken():
+    print("auth token for use:",controller.get("Authorization"))
     return "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDg4OTE4MSwianRpIjoiNDE2MGQwODQtYzI4Yy00NmVlLWI0MmItMDlkYzQ3N2ZhZDNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IkJvIiwibmJmIjoxNzY0ODg5MTgxLCJjc3JmIjoiODJiYzVkZDItZmVjOC00NGNiLWFkOTQtZDI3NThjZGE3ZmU1IiwiZXhwIjoxNzcwMDczMTgxLCJyb2xlIjoiYWRtaW4iLCJkZXBhcnRtZW50IjoiS29saW5nIn0.ervCIhnk4iyzZNB4DpuU4IvrtMttntWcdcrvytnUrfauFuGqvPm6_nqH0Ps45gCqhCIUI3YUQti7jk3JTiLsA4L8RFhYOdaFv6LrYjACHINtl6Q1XO5IJTlSAGsuWc3EiWrvpHRfUvDB5-8n6xRNa5qEdwEToZofjcvYrxCuWsZ067rNYVumWR6e9oAOc7IUFHcC_L1vYGwti2SbB8XJAxxkdJc3Zr8YTOD9EBscal1pOOdznRHR4pS3QUUDIpJJxBssINq1wClaS9_8zPYhTW4eMgeq3NDVoqtwaW7y7cwG5BXNIhyicRGD-WD33oAklHr2Ess8wfNrmSs-Ozp-WA"
 
 def onCreateClick():
@@ -125,7 +126,6 @@ def onCreateClick():
     else:
         st.session_state["statusMsg"] = jsonResp.get("msg")
     
-    
 def onUpdateClick():
     #make req body
     body = {
@@ -174,6 +174,15 @@ def onUpdateIdChange():
         st.session_state["updateStartDate"] = json["startDate"]
         st.session_state["updateEndDate"] = json["endDate"]            
 
+# kæmpe rod af funktioner, brude ryde op hvis jeg for tid, men har prøvet at give dem gode navne
+# det der sker: 
+#   Vi henter alt data fra 3 kilder: subsciptions, cars og customers
+#   Vi lægger alt sammen på subscription-listen så vi for alle relevate info ved at matche "keys" med deres referance i subscription (ligesom joins i sql)
+#   Vi lægge den "master-liste" i et panda dataframe
+#   Nu laver vi et filterDict baseret på brugerInput og defaults (vi tager bare værdierne af inputfelterne hvis der er skrevet noget)
+#   Nu filtere vi dataframet baseret på vores filterDict, det gør vi ved at gå igennem og matche values, og hvis match er mask=True (mask er en value for en row i et df som virker lidt ligesom "display", og det hele er formateret i et "pdSeries" som er sådan lidt ligesom en liste som har værdierne "index" og "mask")
+#   Det filtrerede df bliver nu vist:D
+
 def getData ():
 
     subResp = requests.request(
@@ -219,7 +228,15 @@ def joinLists(db1, db2, key1, key2):
 
     return result
 
-def getFormattedData ():
+def renameKey(list_of_dicts, old_key, new_key):
+    new_list = []
+    for d in list_of_dicts:
+        if old_key in d:
+            d[new_key] = d.pop(old_key)
+        new_list.append(d)
+    return new_list
+
+def getFormattedData ():    # kombinerer alle vores tre lists til en baseret på subscriptions
     unformatedData = getData()
     subCar = joinLists(
         unformatedData["subList"],
@@ -237,18 +254,10 @@ def getFormattedData ():
     formatedSubCarCustomer = renameKey(subCarCustomer,"_id","customer Id")
     return formatedSubCarCustomer
 
-def renameKey(list_of_dicts, old_key, new_key):
-    new_list = []
-    for d in list_of_dicts:
-        if old_key in d:
-            d[new_key] = d.pop(old_key)
-        new_list.append(d)
-    return new_list
-
-def extract_filters(input_dict):
+def extract_filters(input_dict): # her henter vi brugerfiltrene fra sessionstate
     result = {}
     for key, value in input_dict.items():
-        if key.startswith("filter") and value:
+        if key.startswith("filter") and value:  # de hedder alle sammen de rigtige keys, men skal have fjernet "filter"
             # Remove 'filter' prefix
             new_key = key[len("filter"):] if key != "filter" else ""
             if new_key:  # Only add if new_key is not empty
@@ -256,13 +265,10 @@ def extract_filters(input_dict):
     return result
 
 def filter_dataframe(df, filter_dict):
-    mask = pd.Series(True, index=df.index)
-    for key, value in filter_dict.items():
-        if isinstance(value, list):
-            mask &= df[key].isin(value)
-        else:
-            mask &= (df[key] == value)
-    return df[mask]
+    mask = pd.Series(True, index=df.index)  # de to argumenter er de to "kulonner" i serien, en af dem er index og den anden er altid true (så der er to værdier, true og index i serien)
+    for key, value in filter_dict.items():        
+        mask &= (df[key] == value)  # &= betyder "and equal to", så den tjekker bare begge conditions, i det her tilfælde er mask enten true eller false
+    return df[mask] #her aplyer vi bare maskSerisen til df, ligesom vi senere tilføjer column listen:D
 
 data = getFormattedData()
 
@@ -324,7 +330,7 @@ with subLeft:
 
 with subRight:
     carRightTitle = st.subheader("Kontrolpanel")
-    tab1, tab2, tab3, tab4 = st.tabs(["Søg og filtrér", "Opret abonnetment", "Opdater"])
+    tab1, tab2, tab3 = st.tabs(["Søg og filtrér", "Opret abonnetment", "Opdater"])
 
     with tab1:
         with st.container(border=True): # filterer
