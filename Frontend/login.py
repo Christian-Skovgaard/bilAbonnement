@@ -26,3 +26,4 @@ with st.container(border=True):
             st.switch_page("pages/cars.py")
         else:
             st.write(f":red[{response.json()["error"]}]")
+
