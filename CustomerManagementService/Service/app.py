@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+import jwt # vi bruger ikke flask framework fordi den require at vi verifier, hvilket vi har gjordt i gatewayen
 import pymongo
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -85,6 +86,11 @@ def add_customer():
 @app.delete('/customers/<customerId>')
 def deleteCustomer(customerId):
 
+    token = request.headers.get("Authorization").split()[1] # her tager vi auth headeren ("Bearer .....") og så spliter vi den så vi for en liste med 2 dele og vi tager den sidste altså så vi kun for token uden "bearer"
+    claims = jwt.decode(token, options={"verify_signature": False})
+    if claims["role"] != "admin":
+        return jsonify({"msg": "not authorized, need admin power"})
+
     result = mycol.delete_one({"_id": ObjectId(customerId)}) # delete_many bare lige, hvis der på mærkelig vis var flere biler med samme reg. nr.
     return jsonify({
         "msg": "top sussecc 🏋️"
@@ -96,7 +102,11 @@ def deleteCustomer(customerId):
 @app.route('/test', methods=['GET'])
 def test():
     
-    return jsonify("i am alive 🧟")
+    token = request.headers.get("Authorization").split()[1] # her tager vi auth headeren ("Bearer .....") og så spliter vi den så vi for en liste med 2 dele og vi tager den sidste altså så vi kun for token uden "bearer"
+    claims = jwt.decode(token, options={"verify_signature": False})
+
+    # return jsonify("i am alive 🧟")
+    return jsonify(claims)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5009)

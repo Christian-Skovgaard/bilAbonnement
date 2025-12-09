@@ -4,8 +4,6 @@ import pandas as pd
 import requests
 # import subscriptionDataUtil as dataUtil
 
-
-
 controller = CookieController()
 
 st.set_page_config(page_title="Oversigt | Bilabonnement", page_icon="⏱️", layout="wide")
@@ -31,14 +29,16 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
     #create
     if "createNewUser" not in st.session_state:
         st.session_state.createNewUser = "Opret ny bruger"
+    
     if "createNewUserFName" not in st.session_state:
         st.session_state.createNewUserFName = ""
-    if "createNewUserFName" not in st.session_state:
-        st.session_state.createNewUserFName = ""
+    if "createNewUserLName" not in st.session_state:
+        st.session_state.createNewUserLName = ""
     if "createNewUserAge" not in st.session_state:
         st.session_state.createNewUserAge = ""
-    if "createNewUserAge" not in st.session_state:
-        st.session_state.createNewUserAge = ""
+    if "createNewUserDriversLicense" not in st.session_state:
+        st.session_state.createNewUserDriversLicense = ""
+    
     if "createExistingUserId" not in st.session_state:
         st.session_state.createExistingUserId = ""
     
@@ -56,6 +56,7 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
     if "statusMsg" not in st.session_state:
         st.session_state.statusMsg = ""
 
+    # update
     if "updateId" not in st.session_state:
         st.session_state.updateId = ""
     if "updateActive" not in st.session_state:
@@ -90,15 +91,16 @@ def onCreateClick():
                 "Content-Type": "application/json"
             },
             json={
-                
+                "age": st.session_state["createNewUserAge"],
+	            "driversLicense": st.session_state["createNewUserDriversLicense"],
+                "firstName": st.session_state["createNewUserFName"],
+                "lastName": st.session_state["createNewUserLName"]
             }
         )
         customerJson = customerResp.json()
         userId = customerJson["_id"]
     else:
         userId = st.session_state["createExistingUserId"]
-
-    
 
     resp = requests.request(
         method="POST",
@@ -111,16 +113,45 @@ def onCreateClick():
             "startDate":st.session_state.createDateStart,
             "endDate":st.session_state.createDateEnd,
             "pickupLocation":st.session_state.createLocation,
-            "associatedCustommerId":userId,
+            "associatedCustomerId":userId,
             "associatedRegNr":st.session_state.createCarRegNr,
-            "pricePrMonth":st.session_state.createPricePrMonth
+            "pricePrMonth":int(st.session_state.createPricePrMonth)
         }
     )
     jsonResp = resp.json()
-    st.session_state["statusMsg"]["msg"] = jsonResp
+    print(jsonResp)
+    if jsonResp.get("error"):
+        st.session_state["statusMsg"] = jsonResp.get("error")
+    else:
+        st.session_state["statusMsg"] = jsonResp.get("msg")
+    
     
 def onUpdateClick():
-    None
+    #make req body
+    body = {
+        "active": st.session_state["updateActive"],
+        "associatedCustomerId": st.session_state["updateCustommerId"],
+        "associatedRegNr": st.session_state["updateRegNr"],
+        "pricePrMonth": st.session_state["updatePricePrMonth"],
+        "pickupLocation": st.session_state["updatePickupLocation"],
+        "startDate": st.session_state["updateStartDate"],
+        "endDate": st.session_state["updateEndDate"],
+    }
+
+    url = f"http://localhost:5001/subscription-management-service/subscriptions/{st.session_state['updateId']}"
+
+    resp = requests.request(
+        method="PUT",
+        url=url,
+        json=body,
+        headers={"Authorization": getAuthToken()}
+    )
+    jsonResp = resp.json()
+
+    if jsonResp.get("error"):
+        st.session_state["statusMsg"] = jsonResp.get("error")
+    else:
+        st.session_state["statusMsg"] = jsonResp.get("message")
 
 def onUpdateIdChange():
     subId = st.session_state.updateId
@@ -141,10 +172,7 @@ def onUpdateIdChange():
         st.session_state["updatePricePrMonth"] = str(json["pricePrMonth"]) # det er et tal, 
         st.session_state["updatePickupLocation"] = json["pickupLocation"]
         st.session_state["updateStartDate"] = json["startDate"]
-        st.session_state["updateEndDate"] = json["endDate"]
-        
-
-    
+        st.session_state["updateEndDate"] = json["endDate"]            
 
 def getData ():
 
@@ -204,9 +232,10 @@ def getFormattedData ():
         formatedSubCar,
         unformatedData["customerList"],
         "associatedCustomerId",
-        "customerId"
+        "_id"
         )
-    return subCarCustomer
+    formatedSubCarCustomer = renameKey(subCarCustomer,"_id","customer Id")
+    return formatedSubCarCustomer
 
 def renameKey(list_of_dicts, old_key, new_key):
     new_list = []
@@ -243,7 +272,7 @@ filter = extract_filters(st.session_state)
 
 filterdDF = filter_dataframe(df,filter)
 
-filterdDF = filterdDF[["active","startDate","endDate","firstName","lastName","brand","model","regNr","pricePrMonth","pickupLocation","orderDate","customerId","subscription ID"]]
+filterdDF = filterdDF[["active","startDate","endDate","firstName","lastName","brand","model","regNr","pricePrMonth","insuranceDealNr","pickupLocation","orderDate","customer Id","subscription ID"]]
 
 
 col1, col2 = st.columns([5,1], vertical_alignment="center")
@@ -295,11 +324,11 @@ with subLeft:
 
 with subRight:
     carRightTitle = st.subheader("Kontrolpanel")
-    tab1, tab2, tab3 = st.tabs(["Søg og filtrér", "Opret abonnetment", "Opdater"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Søg og filtrér", "Opret abonnetment", "Opdater"])
 
     with tab1:
         with st.container(border=True): # filterer
-            filteractive = st.checkbox(label="Kun aktive", key="filteractive", value=True)
+            filteractive = st.checkbox(label="Kun aktive", key="filteractive", value=st.session_state.filteractive)
             
             filterRight, filterLeft = st.columns(2)
             with filterRight:
@@ -358,6 +387,8 @@ with subRight:
                 updateRegNr = st.text_input(label="updateRegNr", key="updateRegNr", value=st.session_state.updateRegNr)
                 updatePickupLocation = st.text_input(label="updatePickupLocation", key="updatePickupLocation", value=st.session_state.updatePickupLocation)
                 updateEndDate = st.text_input(label="updateEndDate", key="updateEndDate", value=st.session_state.updateEndDate)
+
+        st.button(label="update!",on_click=onUpdateClick)
 
 
     if st.session_state["statusMsg"] != "":
