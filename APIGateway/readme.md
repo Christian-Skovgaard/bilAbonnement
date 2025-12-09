@@ -21,6 +21,7 @@ use: `http://localhost:5001/getAuthToken`
 ## ☎️ Available services
 
 | Service | Path |
+|---------|----------|----------|
 | Car catalog service | car-catalog-service |
 | Customer support service | customer-support-service |
 | Authorization service | authorization-service |
