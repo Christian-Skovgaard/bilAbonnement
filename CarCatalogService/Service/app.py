@@ -22,7 +22,7 @@ def search_cars():
     queryParams = request.args # Dict of query parameters
     query = []
 
-    for key, value in queryParams.items():      
+    for key, value in queryParams.items():
         if value.lower() == ("true"): # Is boolean?
             query.append({key: True})
         elif value.lower() == ("false"):
