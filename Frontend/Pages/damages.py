@@ -44,7 +44,9 @@ col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
 
-user = st.session_state["username"] or "Guest"
+user = st.session_state.get("username", "Guest")
+if user == "Guest":
+    st.switch_page("login.py")
 
 with col2:
     st.subheader(f"Hej {user}!")
