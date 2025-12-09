@@ -1,44 +1,61 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 import pymongo
+from bson.objectid import ObjectId
 
-myclient = pymongo.MongoClient("mongodb://damage-registrations-db:27017")
-mydb = myclient["damage-registrations-db"] # Choose database "car-catalog-db"
-mycol = mydb["damageCases"] # Choose collection
+myclient = pymongo.MongoClient("mongodb://damage-registration-db:27017")
+mydb = myclient["damage-registration-db"] # Choose database "car-catalog-db"
+mycol = mydb["cases"] # Choose collection
 
 app = Flask(__name__)
 
 # Get all damageCases
-@app.route('/damageCases', methods=['GET'])
-def get_damageCases():
-    cursor = mycol.find({}, {"_id": 0})
-    damageCases = list(cursor)
+@app.route('/cases', methods=['GET'])
+def get_cases():
+    cursor = mycol.find({})
+    damageCases = []
+    for doc in cursor:
+        # Convert ObjectId (or other non-JSON types) to string
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
     return jsonify(damageCases)
 
-#Search damageCases med regNr
-@app.route('/damageCases/<regnr>/query', methods=['GET'])
-def search_damageCases(regnr):
-    # Brug regnr direkte uden at fjerne mellemrum
-    queryParams = request.args
-    query = [{"regNr": regnr}]  
+# Find damageCases for regNr
+@app.route('/cases/<regNr>', methods=['GET'])
+def get_cases_by_regnr(regNr):
+    cursor = mycol.find({"regNr" : regNr})
+    damageCases = []
+    for doc in cursor:
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
+    return jsonify(damageCases)
 
-    # Tilføj yderligere query-parametre som regex
+# Query damageCases med regNr
+@app.route('/cases/<regNr>/query', methods=['GET'])
+def query_by_regnr(regNr):
+    queryParams = request.args
+    query = [{"regNr": regNr}]
     for key, value in queryParams.items():
         if value != "":
             query.append({key: {"$regex": value, "$options": "i"}})
-
     mongo_filter = {"$and": query} if query else {}
-
     cursor = mycol.find(mongo_filter)
-    damageCases = list(cursor)
+    damageCases = []
+    for doc in cursor:
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        damageCases.append(doc)
     return jsonify(damageCases)
 
 #POST på RegNr
-@app.route('/damageCases/<regNr>', methods=['POST'])
-def add_damagecase(regNr):
+@app.route('/cases/<regNr>', methods=['POST'])
+def add_case(regNr):
     data = request.get_json()
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
 
+    # Ensure regNr is always set from URL
     data["regNr"] = regNr
 
     cursor = mycol.insert_one(data)
@@ -50,30 +67,35 @@ def add_damagecase(regNr):
     }), 201
 
 
-
-
 #PUT damageCases med caseId 
-@app.route('/damageCases/<int:caseId>', methods=['PUT'])
-def update_damageCases(caseId):
+@app.route('/cases/<caseId>', methods=['PUT'])
+def update_case(caseId):
     data = request.get_json()
 
     if not data:
         return jsonify({"error": "No JSON body provided"}), 400
     
-    data.pop("_id", None)
-
     cursor = mycol.update_one(
-        {"caseId": caseId},
+        {"_id": ObjectId(caseId)},
         {"$set": data}
     )
 
     if cursor.matched_count == 0:
-        return jsonify({"error": "Complaint not found"}), 404
+        return jsonify({"error": "Case not found"}), 404
 
-    return jsonify({"message": "Complaint updated"}), 200
+    return jsonify({"message": "Case updated"}), 200
+
+# DELETE damageCase på caseId
+@app.route('/cases/<caseId>', methods=['DELETE'])
+def delete_case(caseId):
+    result = mycol.delete_one({"_id": ObjectId(caseId)})
+
+    # Check if any document was actually deleted
+    if result.deleted_count == 0:
+        abort(404, description=f"Case with ID {caseId} not found.")
+
+    return jsonify({"message": f"Case with ID {caseId} deleted"})
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5005)
-
-

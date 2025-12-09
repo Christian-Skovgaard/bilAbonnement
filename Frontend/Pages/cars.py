@@ -13,11 +13,11 @@ def queryParamsToString():
     if len(st.query_params.items()) != 0:
         queryString = ""
         for key, value in st.query_params.items():
-            if value != None or value != "" or value != null:
+            if value not in (None, "", "null"):
                 queryString += f"{key}={value}&"
-        return queryString[0:len(queryString)-1] # Return query string and remove the last "&".
-    else:
-        return ""
+        return queryString[:-1]  # remove last "&"
+    return ""
+
 
 def hasEmpty(list):
     for value in list:
@@ -39,19 +39,7 @@ def removeEmptyFromDict(dict):
             result[key] = value
     return result
 
-try:
-    if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
-    else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/car-catalog-service/cars", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
-    cars = response.json()
-    dataframe = pd.DataFrame(cars)
-except:
-    if "Authorization" in controller.getAll():
-        controller.remove("Authorization")
-    if "JWT" in controller.getAll():
-        controller.remove("JWT")
-    st.switch_page("login.py")
+
 
 
 # Streamlit
@@ -61,8 +49,25 @@ col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
 
+user = st.session_state.get("username", "Guest")
+if user == "Guest":
+    st.switch_page("login.py")
+
+
+    # ✅ Load cars once when landing on /cars
+if "cars_df" not in st.session_state:
+    response = requests.get(
+        "http://localhost:5001/car-catalog-service/cars",
+        headers={"Authorization": controller.get("Authorization")}
+    )
+    if response.status_code == 200:
+        st.session_state["cars_df"] = pd.DataFrame(response.json())
+    else:
+        st.session_state["cars_df"] = pd.DataFrame([])  # fallback empty
+
+
 with col2:
-    st.subheader("Hej Victor!")
+    st.subheader(f"Hej {user}!")
     if st.button(label="Log ud"):
         if "Authorization" in controller.getAll():
             controller.remove("Authorization")
@@ -79,6 +84,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.switch_page("pages/damages.py")
 
     with tasksBtn:
@@ -94,11 +103,12 @@ with st.container(border=True):
             st.switch_page("pages/customersupport.py")
 
 carLeft, carRight = st.columns([6,4])
+
 with carLeft:
     st.subheader("Oversigt over biler")
-    with st.container(border=True): # Dataframe opdateres ved hver ændring i text_input eller button presses.
-        st.dataframe(dataframe, hide_index=True)
-        
+    with st.container(border=True):
+        if "cars_df" in st.session_state:
+            st.dataframe(st.session_state["cars_df"], hide_index=True)    
 
 with carRight:
     carRightTitle = st.subheader("Kontrolpanel")
@@ -126,31 +136,51 @@ with carRight:
 
             anvendBtn, nulstilBtn = st.columns(2)
             with anvendBtn:
-                if st.button(label="Anvend"):
+                if st.button(label="Anvend", type="primary"):
+                    # Build query parameters only when button is pressed
                     updateQueryParams(filterRegNr, "regNr")
                     updateQueryParams(filterBrand, "brand")
                     updateQueryParams(filterModel, "model")
                     updateQueryParams(filterModelYear, "modelYear")
-                    updateQueryParams(filterBrand, "brand")
-                    updateQueryParams(filterBrand, "brand")
-                    updateQueryParams(filterBrand, "brand")
-                    if filterPropellant == "Alle":
-                        updateQueryParams("", "propellant") # "Alle" skal ikke sendes med som en query parameter - det skal bare være tomt.
-                    else:
-                        updateQueryParams(filterPropellant, "propellant")
-                    #st.query_params["maxKmDriven"] = filterMaxKmDriven
-                    #st.query_params["monthlyMin"] = monthlyPrice[0] # min
-                    #st.query_params["monthlyMax"] = monthlyPrice[1] # max
-                    if filterAvailable == False:
-                        updateQueryParams("", "available") # "False" skal ikke sendes med som en query parameter - det skal bare være tomt.
-                    else:
-                        updateQueryParams(filterPropellant, "available")
-                        st.query_params["available"] = filterAvailable
-                    st.rerun()
-            with nulstilBtn:
-                if st.button(label="Nulstil"):
-                    st.query_params = {}
-                    st.rerun()
+
+                if filterPropellant == "Alle":
+                    updateQueryParams("", "propellant")
+                else:
+                    updateQueryParams(filterPropellant, "propellant")
+
+                # Kilometer range
+                st.query_params["minKm"] = 0
+                st.query_params["maxKm"] = filterMaxKmDriven
+
+                # Price range
+                st.query_params["minPrice"] = filterMonthlyPrice[0]
+                st.query_params["maxPrice"] = filterMonthlyPrice[1]
+
+                # Availability
+                if filterAvailable:
+                    st.query_params["available"] = "true"
+                else:
+                    st.query_params.pop("available", None)
+
+                # Build query string
+                query_string = queryParamsToString()
+
+                # ✅ Call backend only once here
+                if query_string:
+                    response = requests.get(
+                        f"http://localhost:5001/car-catalog-service/cars/query?{query_string}",
+                        headers={"Authorization": controller.get("Authorization")}
+                    )
+                else:
+                    response = requests.get(
+                        "http://localhost:5001/car-catalog-service/cars",
+                        headers={"Authorization": controller.get("Authorization")}
+                    )
+
+                cars = response.json()
+                st.session_state["cars_df"] = pd.DataFrame(cars)
+
+
 
     with tab2: # Mangler access control via. roles
         with st.container(border=True):

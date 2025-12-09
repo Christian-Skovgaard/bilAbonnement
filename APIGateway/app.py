@@ -8,9 +8,11 @@ services = {
     "car-catalog-service": "http://car-catalog-service:5002",
     "customer-support-service": "http://customer-support-service:5003/",
     "authorization-service": "http://authorization-service:5004",
+    "damage-registration-service" : "http://damage-registration-service:5005",
     "payment-service": "temp:5007",
     "subscription-management-service": "http://subscription-management-service:5008",
-    "customer-management-service": "http://customer-management-service:5009"
+    "customer-management-service": "http://customer-management-service:5009",
+    "task-management-service": "http://task-management-service:5010"
 }
 
 
