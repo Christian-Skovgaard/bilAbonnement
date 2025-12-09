@@ -2,3 +2,4 @@
 restartDocker.sh
 __pycache__
 **/pycache
+test.py

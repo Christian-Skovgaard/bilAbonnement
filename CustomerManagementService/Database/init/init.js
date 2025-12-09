@@ -11,30 +11,35 @@ db.customers.insertMany([
     "lastName": "Thompson",
     "age": 28,
     "driversLicense": "T4873921",
-    "isNice": true
+    "isNice": true,
+    "customerId":"1"
   },
   {
     "firstName": "Sophia",
     "lastName": "Martinez",
     "age": 32,
-    "driversLicense": "M9283745"
+    "driversLicense": "M9283745",
+    "customerId":"2"
   },
   {
     "firstName": "Ethan",
     "lastName": "Walker",
     "age": 24,
-    "driversLicense": "W5638294"
+    "driversLicense": "W5638294",
+    "customerId":"3"
   },
     {
     "firstName": "Olivia",
     "lastName": "Anderson",
     "age": 30,
-    "driversLicense": "A7532941"
+    "driversLicense": "A7532941",
+    "customerId":"4"
   },
   {
     "firstName": "Noah",
     "lastName": "Bennett",
     "age": 27,
-    "driversLicense": "B9821437"
+    "driversLicense": "B9821437",
+    "customerId":"5"
   }
 ]);
