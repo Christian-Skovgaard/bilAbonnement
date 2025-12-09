@@ -20,16 +20,15 @@ use: `http://localhost:5001/getAuthToken`
 
 ## ☎️ Available services
 
-| Service | Path |
-|---------|----------|----------|
-| Car catalog service | car-catalog-service |
-| Customer support service | customer-support-service |
-| Authorization service | authorization-service |
-| Damage registration service | damage-registration-service |
+| Service                         | Path                          |
+|---------------------------------|-------------------------------|
+| Car catalog service             | car-catalog-service           |
+| Customer support service        | customer-support-service      |
+| Authorization service           | authorization-service         |
+| Damage registration service     | damage-registration-service   |
 | Subscription management service | subscription-management-service |
-| Customer management service | customer-management-service |
-| Task management service | task-management-service |
-
+| Customer management service     | customer-management-service   |
+| Task management service         | task-management-service       |
 
 This service is expected to run as part of a bigger service. To learn more about how to get the service running, check out the README at the [Bilabonnement repository](https://github.com/Christian-Skovgaard/bilAbonnement).
 
