@@ -12,7 +12,7 @@ db.subscriptions.insertMany([
     "endDate": "2026-02-22",
     "active": true,
     "pickupLocation": "Aarhus",
-    "associatedCustomerId": "1",
+    "associatedCustomerId": "6936e20cd28bec25e19dc29d",
     "associatedRegNr": "XD69420",
     "pricePrMonth": 3600,
     "insuranceDealNr": 2
@@ -23,7 +23,7 @@ db.subscriptions.insertMany([
     "endDate": "2026-01-15",
     "active": true,
     "pickupLocation": "Copenhagen",
-    "associatedCustomerId": "3",
+    "associatedCustomerId": "6936e20cd28bec25e19dc29f",
     "associatedRegNr": "ab 2039",
     "pricePrMonth": 4100,
     "insuranceDealNr": 1
@@ -34,7 +34,7 @@ db.subscriptions.insertMany([
     "endDate": "2025-11-30",
     "active": false,
     "pickupLocation": "Aalborg",
-    "associatedCustomerId": "2",
+    "associatedCustomerId": "6936e20cd28bec25e19dc29e",
     "associatedRegNr": "JD97731",
     "pricePrMonth": 3300,
     "insuranceDealNr": 3
@@ -45,7 +45,7 @@ db.subscriptions.insertMany([
     "endDate": "2026-03-10",
     "active": true,
     "pickupLocation": "Aarhus",
-    "associatedCustomerId": "4",
+    "associatedCustomerId": "6936e20cd28bec25e19dc2a0",
     "associatedRegNr": "kd 4401",
     "pricePrMonth": 3900,
     "insuranceDealNr": 2
@@ -56,7 +56,7 @@ db.subscriptions.insertMany([
     "endDate": "2025-11-28",
     "active": false,
     "pickupLocation": "Kolding",
-    "associatedCustomerId": "5",
+    "associatedCustomerId": "6936e20cd28bec25e19dc2a1",
     "associatedRegNr": "fy 5592",
     "pricePrMonth": 3000,
     "insuranceDealNr": 4
@@ -67,7 +67,7 @@ db.subscriptions.insertMany([
     "endDate": "2026-02-18",
     "active": true,
     "pickupLocation": "Aarhus",
-    "associatedCustomerId": "7",
+    "associatedCustomerId": "6936e20cd28bec25e19dc2a5",
     "associatedRegNr": "jh 2209",
     "pricePrMonth": 3700,
     "insuranceDealNr": 1
