@@ -15,5 +15,6 @@ INSERT INTO users (username, password, role, department) VALUES
 ('Bo', 'Elefant', 'admin', 'Koling'),
 ('AndersElten42', 'chalklin', 'user', 'København'),
 ('custommerManagementService','Ugenkendlig Thai-ret','application',NULL),
-('subscriptionManagementService','Hungren efter druknedoed','application',NULL)
+('subscriptionManagementService','Hungren efter druknedoed','application',NULL),
+('carCarCatalogService', 'superHemmeligKodeIClearText', 'application')
 
