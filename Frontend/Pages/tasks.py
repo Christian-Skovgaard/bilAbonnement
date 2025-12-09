@@ -50,6 +50,7 @@ with st.container(border=True):
     with damageRegiBtn:
         if st.button(label="Skader"):
             st.query_params = {}
+            st.switch_page("pages/damages.py")
             
     with tasksBtn:
         if st.button(label="Opgaver", type="primary"):

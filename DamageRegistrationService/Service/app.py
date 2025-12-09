@@ -85,7 +85,7 @@ def update_case(caseId):
 
     return jsonify({"message": "Case updated"}), 200
 
-# DELETE damageCase på caseId 
+# DELETE damageCase på caseId
 @app.route('/cases/<caseId>', methods=['DELETE'])
 def delete_case(caseId):
     result = mycol.delete_one({"_id": ObjectId(caseId)})
