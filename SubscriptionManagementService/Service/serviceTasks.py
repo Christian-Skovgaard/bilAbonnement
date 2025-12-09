@@ -10,6 +10,28 @@ load_dotenv()
 def onSubscriptionStart (subObj):
     authToken = getAuthToken()
     
+    # Opret task i TaskManagementService
+    taskResp = requests.request(
+        method="POST",
+        url=f"{os.getenv('GATEWAY_URL')}/task-management-service/tasks",
+        headers={
+            "Authorization": f"Bearer {authToken}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "title": f"Ny subscription startet - {subObj['associatedRegNr']}",
+            "description": f"Subscription med ID {subObj['id']} er blevet oprettet og startet for bil {subObj['associatedRegNr']}",
+            "assignedTo": "Reception",
+            "status": "pending"
+        }
+    )
+    
+    if "error" in taskResp:
+        return {
+            "success": False,
+            "err": taskResp["error"]
+            }
+    
     # skrive og resaverer bilen
     carResp = requests.request(
         method="PUT",
