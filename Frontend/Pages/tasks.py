@@ -62,31 +62,29 @@ with st.container(border=True):
         if st.button(label="Kundeservice"):
             st.switch_page("pages/customersupport.py")
 
-tasks = st.columns([6,4])
-with tasks[0]:
-    st.subheader("Oversigt over opgaver")
-    with st.container(border=True):
-        edited_df = st.data_editor(
-            dataframe, 
-            hide_index=True, 
-            column_config={
-                "_id": None,
-                "status": st.column_config.SelectboxColumn(
+st.subheader("Oversigt over opgaver")
+
+if len(dataframe) > 0:
+    for index, row in dataframe.iterrows():
+        with st.container(border=True):
+            col1, col2, col3 = st.columns([4, 2, 1])
+            
+            with col1:
+                st.markdown(f"**{row['title']}**")
+                st.write(row['description'])
+            
+            with col2:
+                st.write(f"**Tildelt til:** {row['assignedTo']}")
+                new_status = st.selectbox(
                     "Status",
-                    options=["pending", "in-progress", "completed"],
-                    required=True
+                    ["pending", "in-progress", "completed"],
+                    index=["pending", "in-progress", "completed"].index(row['status']),
+                    key=f"status_{row['_id']}"
                 )
-            },
-            disabled=["title", "description", "assignedTo"]
-        )
-        
-        if st.button("Gem ændringer"):
-            # Finder de steder hvor der har været ændringer i status
-            for index, row in edited_df.iterrows():
-                original_status = dataframe.loc[index, 'status']
-                new_status = row['status']
-                
-                if original_status != new_status:
+            
+            with col3:
+                st.write("")  # Spacing
+                if st.button("Gem", key=f"save_{row['_id']}"):
                     try:
                         response = requests.put(
                             f"http://localhost:5001/task-management-service/tasks/{row['_id']}/status",
@@ -94,11 +92,12 @@ with tasks[0]:
                             json={"status": new_status}
                         )
                         if response.status_code == 200:
-                            st.success(f"Status opdateret for: {row['title']}")
+                            st.success("Gemt!")
+                            st.rerun()
                         else:
-                            st.error(f"Fejl ved opdatering af {row['title']}: {response.status_code}")
+                            st.error(f"Fejl: {response.status_code}")
                     except Exception as e:
                         st.error(f"Fejl: {str(e)}")
-            
-            st.rerun()
+else:
+    st.info("Ingen opgaver tilgængelige")
     
