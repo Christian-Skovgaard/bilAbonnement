@@ -22,6 +22,7 @@ with st.container(border=True):
 
         if "access_token" in response.json():
             controller.set("Authorization", f"Bearer {response.json()["access_token"]}")
+            st.session_state["username"] = username
             st.switch_page("pages/cars.py")
         else:
             st.write(f":red[{response.json()["error"]}]")
