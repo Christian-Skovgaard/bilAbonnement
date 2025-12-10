@@ -24,4 +24,4 @@ JWT tokens issued contains:
 
 ## 🪳 Known Issues
 * Passwords are currently stored in plain text.
-* The service does not use any sort of rate limiting to protect against bruteforce attacts.
+* The service does not use any sort of rate limiting to protect against bruteforce attacks.
