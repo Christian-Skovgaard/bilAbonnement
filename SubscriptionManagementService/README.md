@@ -48,15 +48,9 @@ The query endpoint allows for flexible filtering of subscriptions for a given ve
 
 * **Example:** To find subscriptions that belong to people named Liam, you would include firstName=Liam
 
-  
 
-    ```
+    `/subscriptions/query?firstName=Liam`
 
-    /subscriptions/query?firstName=Liam
-
-    ```
-
-  
 
 ## 🪳 Known Issues
 
