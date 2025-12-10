@@ -33,10 +33,49 @@ If the frontend doesn't automatically appear, you should be able to access it on
 
 
 ## ❓ How to Use
-:)
+When you've got the project running in Docker Desktop you should be able to navigate around the frontend on [http://localhost:8501/](http://localhost:8501/) or send requests directly to the API gateway (localhost:5001) with software like Postman or Insomnia.
+
+If you wish to send requests, navigate the frontend, or make changes in the code there are two important things to understand which are explained in the following subsections.
+
+### 🔐 Authorizaiton
+All endpoints on the API gateway except `getAuthToken` requires a valid JWT in the header of your request. To get a valid JWT you must send a POST-request with valid login credentials to `getAuthToken`. Valid login credentials can get accessed and updated in the `init.sql` file (see picture below).
+
+![alt_text](./README_images/authorization.png)
+
+We would recommend that you use `{"username": "Bo", "password": "Elefant"}` as the body of your POST-request to `localhost:5001/getAuthToken` or as login credentials on the frontend. The response will include a new JWT associated with your login credentials that will be valid for 30 minutes - copy this response into a new header called "Authorization" with the word "Bearer " in front of it for every subsequent request you wish you make.
+
+![alt_text](./README_images/jwt_header.png)
+
+
+### 🚦 API Intersection
+To combat redundancy in the API gateway, a "request intersection" solution has been made. This means that the microservices' respective endpoints can be accessed adding the given microservice `<service>` and the desired endpoint `<path:path>`.
+
+The microservices are expected to been written as seen on the table below. If you wish to learn about a specific microservice's endpoints, you can visit the README on the desired microservice folder.
+
+| Service | Written as | Endpoints |
+| :--- | :--- | :--- |
+| Car catalog | car-catalog-service | [README](./CarCatalogService/README.md) |
+| Customer support | customer-support-service | [README](./CustomerSupportService/README.md) |
+| Authorization | authorization-service | [README](./AuthorizationService/README.md) |
+| Damage registration | damage-registration-service | [README](./DamageRegistrationService/README.md) |
+| Subscriptions | subscription-management-service | [README](./SubscriptionManagementService/README.md) |
+| Customer management | customer-management-service | [README](./CustomerManagementService/README.md) |
+| Tasks | task-management-service | [README](./TaskManagementService/README.md) |
+
+This means that a GET-request to Car catalog should look something like this: `localhost:5001/car-catalog-service/cars`
 
 ## 🪳 Known Issues
-:)
+* Sensitive information is sent in clear text
+* You are not able to add a new report on the frontend if no damage report is present on a given car
+* It is not possible to add new users on the frontend, not even as admin
+* The frontend has a lot of redundant code and is generally not easy to read
+* Streamlit cookies are very "fragile" and don't save upon closing the browser window or updating the URL
+
 
 ## 📫 Contact
-:)
+If you're interested to learn more about the project or just have questions in general, feel free to reach out to us at the following email addresses:
+* vilo0001 - vilo0001@stud.ek.dk
+* Christian-Skovgaard - chni0005@stud.ek.dk
+* andreas-brandenborg - anbr0003@stud.ek.dk
+* Giemsa-it - magi0002@stud.ek.dk
+* AndreasRG - angu0001@stud.ek.dk
