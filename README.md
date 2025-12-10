@@ -48,7 +48,7 @@ We would recommend that you use `{"username": "Bo", "password": "Elefant"}` as t
 
 
 ### 🚦 API Intersection
-To combat redundancy in the API gateway, a "request intersection" solution has been made. This means that the microservices' respective endpoints can be accessed adding the given microservice `<service>` and the desired endpoint `<path:path>`.
+To combat redundancy in the API gateway, a "request intersection" solution has been made. This means that the microservices' respective endpoints can be accessed adding the given microservice `<service>` and the desired endpoint `<path:path>` in your request.
 
 The microservices are expected to been written as seen on the table below. If you wish to learn about a specific microservice's endpoints, you can visit the README on the desired microservice folder.
 
