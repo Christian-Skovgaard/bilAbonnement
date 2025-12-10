@@ -33,7 +33,7 @@ If the frontend doesn't automatically appear, you should be able to access it on
 
 
 ## ❓ How to Use
-When you've got the project running in Docker Desktop you should be able to navigate around the frontend on [http://localhost:8501/](http://localhost:8501/) or send requests directly to the API gateway (localhost:5001) with software like Postman or Insomnia.
+When you've got the project running in Docker Desktop you should be able to navigate around the frontend on [http://localhost:8501/](http://localhost:8501/) or send requests directly to the API gateway on [http://localhost:5001/](http://localhost:5001/) with software like Postman or Insomnia.
 
 If you wish to send requests, navigate the frontend, or make changes in the code there are two important things to understand which are explained in the following subsections.
 
