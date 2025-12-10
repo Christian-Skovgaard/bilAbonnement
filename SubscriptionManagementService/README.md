@@ -1,4 +1,4 @@
-# Subscriptions Management Service
+# Subscription Management Service
 
 
 ## 📋 Description
