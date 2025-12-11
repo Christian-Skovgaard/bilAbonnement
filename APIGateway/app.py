@@ -98,16 +98,5 @@ def lyskryds(service, path):
 
     return clientResponse
 
-@app.route('/damageCases', methods=['GET'])
-def getAllregistrations():
-
-    # response = requests.get("http://customer-support-service:5003/complaints")
-
-    response = requests.get(f"{DAMAGE_REGISTRATION_SERVICE}/damageCases")
-    return jsonify(response.json()), response.status_code
-
-
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False)
