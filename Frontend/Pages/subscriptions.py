@@ -88,7 +88,7 @@ def onCreateClick():
             method="POST",
             url="http://gateway:5001/customer-management-service/customers",
             headers={
-                "Authorization": getAuthToken(),
+                "Authorization": controller.get("Authorization"),
                 "Content-Type": "application/json"
             },
             json={
@@ -107,7 +107,7 @@ def onCreateClick():
         method="POST",
         url="http://gateway:5001/subscription-management-service/subscriptions",
         headers={
-            "Authorization": getAuthToken(),
+            "Authorization": controller.get("Authorization"),
             "Content-Type": "application/json"
             },
         json={
@@ -144,7 +144,7 @@ def onUpdateClick():
         method="PUT",
         url=url,
         json=body,
-        headers={"Authorization": getAuthToken()}
+        headers={"Authorization": controller.get("Authorization")}
     )
     jsonResp = resp.json()
 
@@ -159,7 +159,7 @@ def onUpdateIdChange():
     resp = requests.request(
         method="GET",
         url=f"http://gateway:5001/subscription-management-service/subscriptions/{subId}",
-        headers={"Authorization": getAuthToken()}
+        headers={"Authorization": controller.get("Authorization")}
     )
     json = resp.json()
 
@@ -188,21 +188,21 @@ def getData ():
     subResp = requests.request(
         method="GET",
         url="http://gateway:5001/subscription-management-service/subscriptions",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
     subJson = subResp.json()
 
     customerResp = requests.request(
         method="GET",
         url="http://gateway:5001/customer-management-service/customers",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
     customerJson = customerResp.json()
     
     carResp = requests.request(
         method="GET",
         url="http://gateway:5001/car-catalog-service/cars",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
     carJson = carResp.json()
 
