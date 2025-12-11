@@ -27,9 +27,9 @@ When you've got the project folder unzipped at your desired destination and Dock
 
 ![alt_text](./README_images/cmd_navigation.png)
 
-The system should now be running! 🎉
+Wait about a minute and the system should now be running! 🎉
 
-If the frontend doesn't automatically appear, you should be able to access it on any browser at [http://localhost:8501/](http://localhost:8501/).
+You should now be able to access the frontend on any browser at [http://localhost:8501/](http://localhost:8501/).
 
 
 ## ❓ How to Use
