@@ -236,8 +236,8 @@ def renameKey(list_of_dicts, old_key, new_key):
         new_list.append(d)
     return new_list
 
-def getFormattedData ():    # kombinerer alle vores tre lists til en baseret på subscriptions
-    unformatedData = getData()
+def getFormattedData (unformatedData):    # kombinerer alle vores tre lists til en baseret på subscriptions
+    #unformatedData = getData()
     subCar = joinLists(
         unformatedData["subList"],
         unformatedData["carList"],
@@ -270,7 +270,41 @@ def filter_dataframe(df, filter_dict):
         mask &= (df[key] == value)  # &= betyder "and equal to", så den tjekker bare begge conditions, i det her tilfælde er mask enten true eller false
     return df[mask] #her aplyer vi bare maskSerisen til df, ligesom vi senere tilføjer column listen:D
 
-data = getFormattedData()
+
+subResp = requests.request(
+        method="GET",
+        url="http://gateway:5001/subscription-management-service/subscriptions",
+        headers={"Authorization": getAuthToken()},
+    )
+subJson = subResp.json()
+
+customerResp = requests.request(
+        method="GET",
+        url="http://gateway:5001/customer-management-service/customers",
+        headers={"Authorization": getAuthToken()},
+    )
+customerJson = customerResp.json()
+    
+carResp = requests.request(
+        method="GET",
+        url="http://gateway:5001/car-catalog-service/cars",
+        headers={"Authorization": getAuthToken()},
+    )
+carJson = carResp.json()
+
+a=  {
+        "subList":subJson,
+        "customerList":customerJson,
+        "carList":carJson
+    }
+
+
+
+
+
+
+
+data = getFormattedData(a)
 
 df = pd.DataFrame(data)
 
