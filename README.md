@@ -29,7 +29,7 @@ When you've got the project folder unzipped at your desired destination and Dock
 
 Wait about a minute and the system should now be running! 🎉
 
-You should now be able to access the frontend on any browser at [http://localhost:8501/](http://localhost:8501/) and login with username: `Bo` and password: `Elefant`.
+You should now be able to access the frontend on any browser at [http://localhost:8501/](http://localhost:8501/) and log in with username: `Bo` and password: `Elefant`.
 
 
 ## ❓ How to Use
