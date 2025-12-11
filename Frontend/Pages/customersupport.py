@@ -58,9 +58,9 @@ def removeEmptyFromDict(dict):
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/customer-support-service/complaints/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get(f"http://gateway:5001/customer-support-service/complaints/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/customer-support-service/complaints", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get("http://gateway:5001/customer-support-service/complaints", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     cases = response.json()
     dataframe = pd.DataFrame(cases)
     canConnect = True
@@ -172,7 +172,7 @@ with customerSuppRight:
                 if hasEmpty([addComplaint, addDate, addName]): # Hvis et af felterne ikke er udfyldt.
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
-                    addResponse = requests.post("http://localhost:5001/customer-support-service/complaints", json={
+                    addResponse = requests.post("http://gateway:5001/customer-support-service/complaints", json={
                             "complaint": addComplaint,
                             "regNr": addRegNr,
                             "date": addDate,
@@ -198,7 +198,7 @@ with customerSuppRight:
 
 
             if st.button(label="Opdater sag", type="primary"):
-                updateResponse = requests.put(f"http://localhost:5001/customer-support-service/complaints/{updateMongoId}", json=removeEmptyFromDict({
+                updateResponse = requests.put(f"http://gateway:5001/customer-support-service/complaints/{updateMongoId}", json=removeEmptyFromDict({
                     "complaint": updateComplaint,
                     "regNr": updateRegNr,
                     "date": updateDate,
@@ -220,7 +220,7 @@ with customerSuppRight:
                 removalMongoId = st.text_input(label="ID", placeholder="Indtast Id", key="removalMongoId")
 
             if st.button(label="Slet Sag", type="primary"):
-                removalResponse = requests.delete(f"http://localhost:5001/customer-support-service/complaints/{removalMongoId}", headers={"Authorization": controller.get("Authorization")})
+                removalResponse = requests.delete(f"http://gateway:5001/customer-support-service/complaints/{removalMongoId}", headers={"Authorization": controller.get("Authorization")})
                 if removalResponse.status_code == 200:
                     st.write("Sagen er nu slettet.")
                     st.rerun()

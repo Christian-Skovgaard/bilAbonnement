@@ -84,7 +84,7 @@ def onCreateClick():
     if st.session_state["createNewUser"] == "Opret ny bruger":
         customerResp = requests.request(
             method="POST",
-            url="http://localhost:5001/customer-management-service/customers",
+            url="http://gateway:5001/customer-management-service/customers",
             headers={
                 "Authorization": getAuthToken(),
                 "Content-Type": "application/json"
@@ -102,7 +102,7 @@ def onCreateClick():
 
     resp = requests.request(
         method="POST",
-        url="http://localhost:5001/subscription-management-service/subscriptions",
+        url="http://gateway:5001/subscription-management-service/subscriptions",
         headers={
             "Authorization": getAuthToken(),
             "Content-Type": "application/json"
@@ -127,7 +127,7 @@ def onUpdateIdChange():
 
     resp = requests.request(
         method="GET",
-        url=f"http://localhost:5001/subscription-management-service/subscriptions/{subId}",
+        url=f"http://gateway:5001/subscription-management-service/subscriptions/{subId}",
         headers={"Authorization": getAuthToken()}
     )
     json = resp.json()
@@ -150,21 +150,21 @@ def getData ():
 
     subResp = requests.request(
         method="GET",
-        url="http://localhost:5001/subscription-management-service/subscriptions",
+        url="http://gateway:5001/subscription-management-service/subscriptions",
         headers={"Authorization": getAuthToken()},
     )
     subJson = subResp.json()
 
     customerResp = requests.request(
         method="GET",
-        url="http://localhost:5001/customer-management-service/customers",
+        url="http://gateway:5001/customer-management-service/customers",
         headers={"Authorization": getAuthToken()},
     )
     customerJson = customerResp.json()
     
     carResp = requests.request(
         method="GET",
-        url="http://localhost:5001/car-catalog-service/cars",
+        url="http://gateway:5001/car-catalog-service/cars",
         headers={"Authorization": getAuthToken()},
     )
     carJson = carResp.json()

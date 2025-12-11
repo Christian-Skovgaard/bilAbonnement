@@ -23,12 +23,12 @@ with st.container(border=True):
     password = st.text_input(label="Password", type="password")
     
     if st.button(label="Log ind"):
-        response = requests.post("http://localhost:5001/getAuthToken", json={"username": username, "password": password})
+        response = requests.post("http://gateway:5001/getAuthToken", json={"username": username, "password": password})
 
         if "access_token" in response.json():
-            controller.set("Authorization", f"Bearer {response.json()["access_token"]}")
+            controller.set("Authorization", f"Bearer {response.json()['access_token']}")
             st.session_state["username"] = username
             st.switch_page("pages/cars.py")
         else:
-            st.write(f":red[{response.json()["error"]}]")
+            st.write(f":red[{response.json()['error']}]")
 

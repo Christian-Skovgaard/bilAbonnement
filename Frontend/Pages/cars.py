@@ -57,7 +57,7 @@ if user == "Guest":
     # ✅ Load cars once when landing on /cars
 if "cars_df" not in st.session_state:
     response = requests.get(
-        "http://localhost:5001/car-catalog-service/cars",
+        "http://gateway:5001/car-catalog-service/cars",
         headers={"Authorization": controller.get("Authorization")}
     )
     if response.status_code == 200:
@@ -168,12 +168,12 @@ with carRight:
                 # ✅ Call backend only once here
                 if query_string:
                     response = requests.get(
-                        f"http://localhost:5001/car-catalog-service/cars/query?{query_string}",
+                        f"http://gateway:5001/car-catalog-service/cars/query?{query_string}",
                         headers={"Authorization": controller.get("Authorization")}
                     )
                 else:
                     response = requests.get(
-                        "http://localhost:5001/car-catalog-service/cars",
+                        "http://gateway:5001/car-catalog-service/cars",
                         headers={"Authorization": controller.get("Authorization")}
                     )
 
@@ -206,7 +206,7 @@ with carRight:
                 if hasEmpty([addRegNr, addBrand, addModel, addModelYear, addPropellant, addKmDriven, addPrice]): # Hvis et af felterne ikke er udfyldt.
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
-                    addResponse = requests.post("http://localhost:5001/car-catalog-service/cars", json={
+                    addResponse = requests.post("http://gateway:5001/car-catalog-service/cars", json={
                             "regNr": addRegNr.replace(" ", ""),
                             "brand": addBrand,
                             "model": addModel,
@@ -240,7 +240,7 @@ with carRight:
             updateAvailable = st.checkbox(label="Tilgængelig", key="updateAvailable")
 
             if st.button(label="Opdater bil", type="primary"):
-                updateResponse = requests.put(f"http://localhost:5001/car-catalog-service/cars/{updateRegNr.replace(" ", "")}", json=removeEmptyFromDict({
+                updateResponse = requests.put(f"http://gateway:5001/car-catalog-service/cars/{updateRegNr.replace(' ', '')}", json=removeEmptyFromDict({
                     "brand": updateBrand,
                     "model": updateModel,
                     "modelYear": updateModelYear,
@@ -259,7 +259,7 @@ with carRight:
             removalRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer", key="removalRegNr")
 
             if st.button(label="Slet bil", type="primary"):
-                removalResponse = requests.delete(f"http://localhost:5001/car-catalog-service/cars/{removalRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
+                removalResponse = requests.delete(f"http://gateway:5001/car-catalog-service/cars/{removalRegNr.replace(' ', '')}", headers={"Authorization": controller.get("Authorization")})
                 if removalResponse.status_code == 200:
                     st.write("Bilen er nu slettet.")
                     st.rerun()

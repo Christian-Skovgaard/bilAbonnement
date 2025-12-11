@@ -11,7 +11,7 @@ tasks = []
 
 # Logik
 try:
-    response = requests.get("http://localhost:5001/task-management-service/tasks", headers={"Authorization": controller.get("Authorization")})
+    response = requests.get("http://gateway:5001/task-management-service/tasks", headers={"Authorization": controller.get("Authorization")})
     tasks = response.json()
     dataframe = pd.DataFrame(tasks)
 except:
@@ -92,7 +92,7 @@ if len(dataframe) > 0:
                 if st.button("Gem", key=f"save_{row['_id']}"):
                     try:
                         response = requests.put(
-                            f"http://localhost:5001/task-management-service/tasks/{row['_id']}/status",
+                            f"http://gateway:5001/task-management-service/tasks/{row['_id']}/status",
                             headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"},
                             json={"status": new_status}
                         )

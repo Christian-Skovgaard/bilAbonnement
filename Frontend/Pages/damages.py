@@ -24,9 +24,9 @@ except Exception as e:
 # Logik
 try:
     if "damageRegNr" in st.session_state:
-        response = requests.get(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageRegNr"]}", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get(f"http://gateway:5001/damage-registration-service/cases/{st.session_state['damageRegNr']}", headers={"Authorization": controller.get("Authorization")})
     else:
-        response = requests.get("http://localhost:5001/damage-registration-service/cases", headers={"Authorization": controller.get("Authorization")})
+        response = requests.get("http://gateway:5001/damage-registration-service/cases", headers={"Authorization": controller.get("Authorization")})
     damageCases = response.json()
     dataframe = pd.DataFrame(damageCases)
 except:
@@ -92,7 +92,7 @@ with damagesLeft:
                     del st.session_state["damageDetails"]
                 st.rerun()
         with test2:
-            st.subheader(f"Skadesrapporter for {st.session_state["damageRegNr"]}")
+            st.subheader(f"Skadesrapporter for {st.session_state['damageRegNr']}")
     else:
         st.subheader("Oversigt over skadesrapporter")
     with st.container(border=True):
@@ -119,11 +119,11 @@ with damagesRight:
     if "damageDetails" in st.session_state:
         idHeaderCol, deleteCol = st.columns([8, 1], vertical_alignment="center")
         with idHeaderCol:
-            st.subheader(f"ID: {st.session_state.damageDetails["_id"]}")
+            st.subheader(f"ID: {st.session_state.damageDetails['_id']}")
         with deleteCol:
             if claims["role"] == "admin":
                 if st.button("Slet", type="primary"):
-                    removalResponse = requests.delete(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", headers={"Authorization": controller.get("Authorization")})
+                    removalResponse = requests.delete(f"http://gateway:5001/damage-registration-service/cases/{st.session_state['damageDetails']['_id']}", headers={"Authorization": controller.get("Authorization")})
                     if removalResponse.status_code == 200:
                         st.rerun()
                     else:
@@ -158,7 +158,7 @@ with damagesRight:
                                 updateDamageBody[key] = int(raw)
                             except Exception:
                                 updateDamageBody[key] = raw   # AI kode slut. Alt muligt Numpy gøgl jeg ikke gider sidde med.
-                    updateResponse = requests.put(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageDetails"]["_id"]}", json=updateDamageBody, headers={"Authorization": controller.get("Authorization")})
+                    updateResponse = requests.put(f"http://gateway:5001/damage-registration-service/cases/{st.session_state['damageDetails']['_id']}", json=updateDamageBody, headers={"Authorization": controller.get("Authorization")})
                     if updateResponse.status_code == 200:
                         st.rerun()
                     else:
@@ -175,7 +175,7 @@ with damagesRight:
                         for something in dataframe.items():
                             if something[0] != "_id":
                                 addDamageBody[str(something[0])] = st.session_state[f"input{something[0]}"]
-                        addResponse = requests.post(f"http://localhost:5001/damage-registration-service/cases/{st.session_state["damageRegNr"]}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
+                        addResponse = requests.post(f"http://gateway:5001/damage-registration-service/cases/{st.session_state['damageRegNr']}", json=addDamageBody, headers={"Authorization": controller.get("Authorization")})
                         if addResponse.status_code == 201:
                             st.rerun()
                         else:
@@ -183,7 +183,7 @@ with damagesRight:
         else: # Reg. nr. ikke valgt.
             damageRegNr = st.text_input(label="Reg. nr.", placeholder="Indtast registreringsnummer")
             if st.button("Find skadesrapporter"):
-                findCarResponse = requests.get(f"http://localhost:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(" ", "")}", headers={"Authorization": controller.get("Authorization")})
+                findCarResponse = requests.get(f"http://gateway:5001/car-catalog-service/cars/query?regNr={damageRegNr.replace(' ', '')}", headers={"Authorization": controller.get("Authorization")})
                 if len(findCarResponse.json()) == 1: # Hvis præcis 1 resultat findes, vis skadesrapporter for gældende reg. nr.
                     st.session_state["damageRegNr"] = findCarResponse.json()[0]["regNr"]
                     st.rerun()
