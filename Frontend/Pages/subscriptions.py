@@ -274,21 +274,21 @@ def filter_dataframe(df, filter_dict):
 subResp = requests.request(
         method="GET",
         url="http://gateway:5001/subscription-management-service/subscriptions",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
 subJson = subResp.json()
 
 customerResp = requests.request(
         method="GET",
         url="http://gateway:5001/customer-management-service/customers",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
 customerJson = customerResp.json()
     
 carResp = requests.request(
         method="GET",
         url="http://gateway:5001/car-catalog-service/cars",
-        headers={"Authorization": getAuthToken()},
+        headers={"Authorization": controller.get("Authorization")},
     )
 carJson = carResp.json()
 
