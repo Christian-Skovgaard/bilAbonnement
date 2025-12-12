@@ -34,8 +34,6 @@ services:
     build:
       context: ./CarCatalogService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    environment:
-      MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog-db" # Use the service name as the hostname
     volumes:
       - ./CarCatalogService/Service:/app # Mount the local directory to the container
     depends_on:
