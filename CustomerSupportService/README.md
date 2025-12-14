@@ -12,7 +12,7 @@ This service is expected to run as part of a bigger service. To learn more about
 
 ### 💬 API Endpoints
 
-The service exposes a RESTful API to manage damage cases stored in the MongoDB database. All endpoints are prefixed with the base path (e.g., `http://damage-registration-service:5005`).
+The service exposes a RESTful API to manage damage cases stored in the MongoDB database. All endpoints are prefixed with the base path (e.g., `http://customer-support-service:5003`).
 
 ## API Endpoints
 

@@ -12,11 +12,10 @@ controller = CookieController()
 try:
     claims = jwt.decode(
         controller.get("Authorization")[7:], # Fjern "bearer" fra cookie.
+        key="",
         options={"verify_signature": False},
         algorithms=["HS256"]
     )
-except jwt.ExpiredSignatureError:
-    print("Token is expired (even without verification, PyJWT checks 'exp' claim)")
 except Exception as e:
     print(f"An error occurred during decoding: {e}")
 
@@ -102,6 +101,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.switch_page("pages/damages.py")
 
     with tasksBtn:
@@ -213,7 +216,7 @@ with customerSuppRight:
                     st.write(f":red[Kunne ikke opdatere sagen. Statuskode: {updateResponse.status_code}]")
 
     with tab4:
-        if claims.get("role") != "admin":
+        if claims["role"] != "admin":
             st.warning("Du har ikke adgang til at slette sager.")
         else:
             with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.

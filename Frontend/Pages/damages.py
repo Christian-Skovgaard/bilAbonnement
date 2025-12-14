@@ -16,10 +16,8 @@ try:
         options={"verify_signature": False},
         algorithms=["HS256"]
     )
-except jwt.ExpiredSignatureError:
-    print("Token is expired (even without verification, PyJWT checks 'exp' claim)")
 except Exception as e:
-    print(f"An error occurred during decoding: {e}")
+    st.write(f"An error occurred during decoding: {e}")
 
 # Logik
 try:
@@ -79,6 +77,7 @@ with st.container(border=True):
 
     with customerSuppBtn:
         if st.button(label="Kundeservice"):
+            st.query_params = {}
             st.switch_page("pages/customersupport.py")
 
 damagesLeft, damagesRight = st.columns([6,4])

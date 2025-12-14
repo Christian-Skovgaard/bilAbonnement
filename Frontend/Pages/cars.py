@@ -100,6 +100,7 @@ with st.container(border=True):
 
     with customerSuppBtn:
         if st.button(label="Kundeservice"):
+            st.query_params = {}
             st.switch_page("pages/customersupport.py")
 
 carLeft, carRight = st.columns([6,4])

@@ -51,6 +51,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.query_params = {}
             st.switch_page("pages/damages.py")
             
@@ -65,6 +69,7 @@ with st.container(border=True):
 
     with customerSuppBtn:
         if st.button(label="Kundeservice"):
+            st.query_params = {}
             st.switch_page("pages/customersupport.py")
 
 st.subheader("Oversigt over opgaver")
