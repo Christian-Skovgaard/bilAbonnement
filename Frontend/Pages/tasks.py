@@ -72,6 +72,38 @@ with st.container(border=True):
             st.query_params = {}
             st.switch_page("pages/customersupport.py")
 
+#Add tasks panel
+with st.container(border=True):
+    st.subheader("Tilføj ny opgave")
+    addTitle = st.text_input(label="Titel", placeholder="Titel på opgave")
+    addDescription = st.text_area(label="Beskrivelse", placeholder="Beskrivelse af opgave")
+    addStatus = st.selectbox(label="Status", options=["pending", "in-progress", "completed"], index=0)
+    addAssignedTo = st.selectbox(label="Tildelt til", options=["Reception", "Inspection", "Salesmen"], index=0)
+
+    if st.button("Tilføj opgave"):
+        try:
+            response = requests.post(
+                "http://gateway:5001/task-management-service/tasks",
+                headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"},
+                json={
+                    "title": addTitle,
+                    "description": addDescription,
+                    "status": addStatus,
+                    "assignedTo": addAssignedTo
+                }
+            )
+            if response.status_code == 201:
+                st.toast("Opgave tilføjet!", icon="✅")
+                import time
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error(f"Fejl: {response.status_code}")
+        except Exception as e:
+            st.error(f"Fejl: {str(e)}")
+
+
+#Tasks management panel
 st.subheader("Oversigt over opgaver")
 
 if len(dataframe) > 0:

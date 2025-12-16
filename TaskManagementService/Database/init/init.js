@@ -39,21 +39,27 @@ db.createCollection("tasks", {
 // Insert sample documents
 db.tasks.insertMany([
   {
-    title: "Design Database Schema",
-    description: "Create the initial database schema for the project.",
+    title: "Bekræft afhentningsaftale",
+    description: "Bekræft afhentningsaftale med kunden.",
     status: "in-progress",
     assignedTo: "Reception"
     },
     {
-    title: "Implement Authentication",
-    description: "Set up user authentication and authorization.",
+    title: "Inspicer bil AB 123 456",
+    description: "Kunden ønsker at få bilen inspiceret grundigt for eventuelle skader.",
     status: "pending",
     assignedTo: "Inspection"
     },
     {
-    title: "Set Up CI/CD Pipeline",
-    description: "Configure continuous integration and deployment pipeline.",
+    title: "Gennemgå aftale med kunde",
+    description: "Gennemgå aftale med kunde for at sikre forståelse og accept af vilkår.",
     status: "completed",
+    assignedTo: "Salesmen"
+    },
+    {
+    title: "Opdater status for lejeaftale",
+    description: "Opdater status for lejeaftale.",
+    status: "pending",
     assignedTo: "Salesmen"
     }
 ]);
