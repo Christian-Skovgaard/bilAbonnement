@@ -24,6 +24,8 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
         st.session_state.filterregNr = ""
     if "filterpickupLocation" not in st.session_state:
         st.session_state.filterpickupLocation = ""
+    if "filtersubscriptionId" not in st.session_state:
+        st.session_state.filtersubscriptionId = ""
     
 
     #create
@@ -73,11 +75,8 @@ def defSessionState(): # har lavet i funtion så jeg kan lukke den så den ikke 
         st.session_state.updateStartDate = ""
     if "updateEndDate" not in st.session_state:
         st.session_state.updateEndDate = ""
-defSessionState()
 
-def getAuthToken():
-    print("auth token for use:",controller.get("Authorization"))
-    return "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDg4OTE4MSwianRpIjoiNDE2MGQwODQtYzI4Yy00NmVlLWI0MmItMDlkYzQ3N2ZhZDNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IkJvIiwibmJmIjoxNzY0ODg5MTgxLCJjc3JmIjoiODJiYzVkZDItZmVjOC00NGNiLWFkOTQtZDI3NThjZGE3ZmU1IiwiZXhwIjoxNzcwMDczMTgxLCJyb2xlIjoiYWRtaW4iLCJkZXBhcnRtZW50IjoiS29saW5nIn0.ervCIhnk4iyzZNB4DpuU4IvrtMttntWcdcrvytnUrfauFuGqvPm6_nqH0Ps45gCqhCIUI3YUQti7jk3JTiLsA4L8RFhYOdaFv6LrYjACHINtl6Q1XO5IJTlSAGsuWc3EiWrvpHRfUvDB5-8n6xRNa5qEdwEToZofjcvYrxCuWsZ067rNYVumWR6e9oAOc7IUFHcC_L1vYGwti2SbB8XJAxxkdJc3Zr8YTOD9EBscal1pOOdznRHR4pS3QUUDIpJJxBssINq1wClaS9_8zPYhTW4eMgeq3NDVoqtwaW7y7cwG5BXNIhyicRGD-WD33oAklHr2Ess8wfNrmSs-Ozp-WA"
+defSessionState()
 
 def onCreateClick():
     displayObj = {}
@@ -175,16 +174,16 @@ def onUpdateIdChange():
         st.session_state["updateEndDate"] = json["endDate"]            
 
 # kæmpe rod af funktioner, brude ryde op hvis jeg for tid, men har prøvet at give dem gode navne
-# det der sker: 
+# det her sker: 
 #   Vi henter alt data fra 3 kilder: subsciptions, cars og customers
-#   Vi lægger alt sammen på subscription-listen så vi for alle relevate info ved at matche "keys" med deres referance i subscription (ligesom joins i sql)
+#   Vi "joiner" alt sammen på subscription-listen så vi for alle relevate info ved at matche "keys" med deres referance i subscription (ligesom joins i sql)
 #   Vi lægge den "master-liste" i et panda dataframe
 #   Nu laver vi et filterDict baseret på brugerInput og defaults (vi tager bare værdierne af inputfelterne hvis der er skrevet noget)
 #   Nu filtere vi dataframet baseret på vores filterDict, det gør vi ved at gå igennem og matche values, og hvis match er mask=True (mask er en value for en row i et df som virker lidt ligesom "display", og det hele er formateret i et "pdSeries" som er sådan lidt ligesom en liste som har værdierne "index" og "mask")
 #   Det filtrerede df bliver nu vist:D
 
-def getData ():
-
+def getData (): 
+    # denne funktion bliver ikke brugt mere pga problemer med cookiecontroler og funktioner (kan slettes)
     subResp = requests.request(
         method="GET",
         url="http://gateway:5001/subscription-management-service/subscriptions",
@@ -244,7 +243,7 @@ def getFormattedData (unformatedData):    # kombinerer alle vores tre lists til 
         "associatedRegNr",
         "regNr"
         )
-    formatedSubCar = renameKey(subCar,"_id","subscription ID")
+    formatedSubCar = renameKey(subCar,"_id","subscriptionId")
     subCarCustomer = joinLists(
         formatedSubCar,
         unformatedData["customerList"],
@@ -254,9 +253,9 @@ def getFormattedData (unformatedData):    # kombinerer alle vores tre lists til 
     formatedSubCarCustomer = renameKey(subCarCustomer,"_id","customer Id")
     return formatedSubCarCustomer
 
-def extract_filters(input_dict): # her henter vi brugerfiltrene fra sessionstate
+def extract_filters(sessionStateDict): # her henter vi brugerfiltrene fra sessionstate
     result = {}
-    for key, value in input_dict.items():
+    for key, value in sessionStateDict.items():
         if key.startswith("filter") and value:  # de hedder alle sammen de rigtige keys, men skal have fjernet "filter"
             # Remove 'filter' prefix
             new_key = key[len("filter"):] if key != "filter" else ""
@@ -292,19 +291,14 @@ carResp = requests.request(
     )
 carJson = carResp.json()
 
-a=  {
+rawData =  {
         "subList":subJson,
         "customerList":customerJson,
         "carList":carJson
     }
 
 
-
-
-
-
-
-data = getFormattedData(a)
+data = getFormattedData(rawData)
 
 df = pd.DataFrame(data)
 
@@ -312,7 +306,7 @@ filter = extract_filters(st.session_state)
 
 filterdDF = filter_dataframe(df,filter)
 
-filterdDF = filterdDF[["active","startDate","endDate","firstName","lastName","brand","model","regNr","pricePrMonth","insuranceDealNr","pickupLocation","orderDate","customer Id","subscription ID"]]
+filterdDF = filterdDF[["active","startDate","endDate","firstName","lastName","brand","model","regNr","pricePrMonth","insuranceDealNr","pickupLocation","orderDate","customer Id","subscriptionId"]]
 
 
 col1, col2 = st.columns([5,1], vertical_alignment="center")
@@ -384,6 +378,7 @@ with subRight:
                 filterlastName = st.text_input(label="Efternavn", key="filterlastName")
                 filterModel = st.text_input(label="Model", key="filterPropellant")
                 filterpickupLocation = st.selectbox(label="Afhentnings sted", options=("","Aarhus", "Kolding", "København"), key="filterpickupLocation")
+            filtersubscriptionId = st.text_input(label="Subscription ID", key="filtersubscriptionId")
 
             
 
@@ -404,10 +399,10 @@ with subRight:
             
             createRight, createLeft = st.columns(2)
             with createRight:
-                createStartDate = st.text_input(label="start dato", placeholder="yyyy-mm-dd", key="createStartDate")
+                createStartDate = st.text_input(label="start dato", placeholder="yyyy-mm-dd", key="createDateStart")
                 createCarRegNr = st.text_input(label="registreringsnummer",key="createCarRegNr")
             with createLeft:
-                createEndDate = st.text_input(label="start dato", placeholder="yyyy-mm-dd", key="createEndDate")
+                createEndDate = st.text_input(label="start dato", placeholder="yyyy-mm-dd", key="createDateEnd")
                 createPricePrMonth = st.text_input(label="aftalt pris pr måned",key="createPricePrMonth")
 
             createLocation = st.selectbox(label="Afhentnings sted", options=("","Aarhus", "Kolding", "København"), key="createLocation")
@@ -438,3 +433,5 @@ with subRight:
 
     if st.session_state["statusMsg"] != "":
         st.write(st.session_state["statusMsg"])
+
+    st.write(extract_filters(st.session_state))
