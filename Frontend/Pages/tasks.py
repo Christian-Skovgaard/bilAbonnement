@@ -83,7 +83,7 @@ with st.container(border=True):
     if st.button("Tilføj opgave"):
         try:
             response = requests.post(
-                "http://localhost:5001/task-management-service/tasks",
+                "http://gateway:5001/task-management-service/tasks",
                 headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"},
                 json={
                     "title": addTitle,
