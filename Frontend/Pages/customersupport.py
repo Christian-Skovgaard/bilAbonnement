@@ -12,11 +12,10 @@ controller = CookieController()
 try:
     claims = jwt.decode(
         controller.get("Authorization")[7:], # Fjern "bearer" fra cookie.
+        key="",
         options={"verify_signature": False},
         algorithms=["HS256"]
     )
-except jwt.ExpiredSignatureError:
-    print("Token is expired (even without verification, PyJWT checks 'exp' claim)")
 except Exception as e:
     print(f"An error occurred during decoding: {e}")
 
@@ -58,9 +57,9 @@ def removeEmptyFromDict(dict):
 
 try:
     if len(st.query_params.items()) != 0: # Hvis der er query parameters
-        response = requests.get(f"http://localhost:5001/customer-support-service/complaints/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get(f"http://gateway:5001/customer-support-service/complaints/query?{queryParamsToString()}", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     else: # Hvis der ikke er query parameters
-        response = requests.get("http://localhost:5001/customer-support-service/complaints", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
+        response = requests.get("http://gateway:5001/customer-support-service/complaints", headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"})
     cases = response.json()
     dataframe = pd.DataFrame(cases)
     canConnect = True
@@ -81,7 +80,9 @@ col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
 
-user = st.session_state["username"] or "Guest"
+user = st.session_state.get("username", "Guest")
+if user == "Guest":
+    st.switch_page("login.py")
 
 with col2:
     st.subheader(f"Hej {user}!")
@@ -100,6 +101,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.switch_page("pages/damages.py")
 
     with tasksBtn:
@@ -170,7 +175,7 @@ with customerSuppRight:
                 if hasEmpty([addComplaint, addDate, addName]): # Hvis et af felterne ikke er udfyldt.
                     st.write(f":red[Alle felter skal udfyldes]")
                 else:
-                    addResponse = requests.post("http://localhost:5001/customer-support-service/complaints", json={
+                    addResponse = requests.post("http://gateway:5001/customer-support-service/complaints", json={
                             "complaint": addComplaint,
                             "regNr": addRegNr,
                             "date": addDate,
@@ -196,7 +201,7 @@ with customerSuppRight:
 
 
             if st.button(label="Opdater sag", type="primary"):
-                updateResponse = requests.put(f"http://localhost:5001/customer-support-service/complaints/{updateMongoId}", json=removeEmptyFromDict({
+                updateResponse = requests.put(f"http://gateway:5001/customer-support-service/complaints/{updateMongoId}", json=removeEmptyFromDict({
                     "complaint": updateComplaint,
                     "regNr": updateRegNr,
                     "date": updateDate,
@@ -211,14 +216,14 @@ with customerSuppRight:
                     st.write(f":red[Kunne ikke opdatere sagen. Statuskode: {updateResponse.status_code}]")
 
     with tab4:
-        if claims.get("role") != "admin":
+        if claims["role"] != "admin":
             st.warning("Du har ikke adgang til at slette sager.")
         else:
             with st.container(border=True): # Lorte streamlit. Løsningen virker, men kunne være meget federe.
                 removalMongoId = st.text_input(label="ID", placeholder="Indtast Id", key="removalMongoId")
 
             if st.button(label="Slet Sag", type="primary"):
-                removalResponse = requests.delete(f"http://localhost:5001/customer-support-service/complaints/{removalMongoId}", headers={"Authorization": controller.get("Authorization")})
+                removalResponse = requests.delete(f"http://gateway:5001/customer-support-service/complaints/{removalMongoId}", headers={"Authorization": controller.get("Authorization")})
                 if removalResponse.status_code == 200:
                     st.write("Sagen er nu slettet.")
                     st.rerun()

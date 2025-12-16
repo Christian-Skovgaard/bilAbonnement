@@ -16,65 +16,54 @@ def get_cars():
     cars = list(cursor)
     return jsonify(cars)
 
-# Get queried cars
-@app.route('/cars/query', methods=['GET']) # Skal kunne tage højde for, om pris er INDEN FOR monthlyMin og monthlyMax
+@app.route('/cars/query', methods=['GET'])
 def search_cars():
-    queryParams = request.args # Dict of query parameters
-    query = []
+    queryParams = request.args
+    filters = []
 
+    # Generic field filters (booleans, ints, strings)
     for key, value in queryParams.items():
-        if value.lower() == ("true"): # Is boolean?
-            query.append({key: True})
-        elif value.lower() == ("false"):
-            query.append({key: False})
+        if key in ["minKm", "maxKm", "minPrice", "maxPrice"]:
+            continue  # handled separately below
+
+        if value.lower() == "true":
+            filters.append({key: True})
+        elif value.lower() == "false":
+            filters.append({key: False})
         elif value.isdigit():
-            query.append({key: int(value)})
-        else: # Is string.
-            if queryParams[key] != "": # Ignorerer parametre som "cars/query?regNr=&model="
-                query.append({key: Regex(value, "i")})
-        
-    if query:
-        mongo_filter = {"$and": query} # Request parameters given.
-    else:
-        mongo_filter = {}  # No request parameters given / empty request parameters like: ?brand=&model=
+            filters.append({key: int(value)})
+        else:
+            if value != "":
+                filters.append({key: Regex(value, "i")})
 
-    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
-    cars = list(cursor)
-    return jsonify(cars)
+    # Kilometer range filter
+    min_km = request.args.get("minKm", type=int)
+    max_km = request.args.get("maxKm", type=int)
+    km_filter = {}
+    if min_km is not None:
+        km_filter["$gte"] = min_km
+    if max_km is not None:
+        km_filter["$lte"] = max_km
+    if km_filter:
+        filters.append({"kmDriven": km_filter})
 
-#Get cars by kilometer range
-@app.route('/cars/kilometer', methods=['GET'])
-def get_cars_by_kilometer():
-    min_km = request.args.get('min', type=int)
-    max_km = request.args.get('max', type=int)
+    # Price range filter
+    min_price = request.args.get("minPrice", type=int)
+    max_price = request.args.get("maxPrice", type=int)
+    price_filter = {}
+    if min_price is not None:
+        price_filter["$gte"] = min_price
+    if max_price is not None:
+        price_filter["$lte"] = max_price
+    if price_filter:
+        filters.append({"monthlyPrice": price_filter})
 
-    mongo_filter = {
-        "kmDriven": {
-            "$gte": min_km,
-            "$lte": max_km
-        }
-    }
+    # Combine everything
+    mongo_filter = {"$and": filters} if filters else {}
 
-    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
-    cars = list(cursor)
-    return jsonify(cars)
+    cursor = mycol.find(mongo_filter, {"_id": 0})
+    return jsonify(list(cursor))
 
-#Get cars by price range
-@app.route('/cars/price', methods=['GET'])
-def get_cars_by_price():
-    min_price = request.args.get('min', type=int)
-    max_price = request.args.get('max', type=int)
-
-    mongo_filter = {
-        "monthlyPrice": {
-            "$gte": min_price,
-            "$lte": max_price
-        }
-    }
-
-    cursor = mycol.find(mongo_filter, {"_id": 0}) # Query and remove MongoDB _id (surpress _id)
-    cars = list(cursor)
-    return jsonify(cars)
 
 # Add a new car
 @app.route('/cars', methods=['POST'])

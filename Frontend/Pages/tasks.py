@@ -11,7 +11,7 @@ tasks = []
 
 # Logik
 try:
-    response = requests.get("http://localhost:5001/task-management-service/tasks", headers={"Authorization": controller.get("Authorization")})
+    response = requests.get("http://gateway:5001/task-management-service/tasks", headers={"Authorization": controller.get("Authorization")})
     tasks = response.json()
     dataframe = pd.DataFrame(tasks)
 except:
@@ -29,7 +29,9 @@ col1, col2 = st.columns([5,1], vertical_alignment="center")
 with col1:
     st.header("Bilabonnement")
 
-user = st.session_state["username"] or "Guest"
+user = st.session_state.get("username", "Guest")
+if user == "Guest":
+    st.switch_page("login.py")
 
 with col2:
     st.subheader(f"Hej {user}!")
@@ -49,6 +51,10 @@ with st.container(border=True):
 
     with damageRegiBtn:
         if st.button(label="Skader"):
+            if "damageRegNr" in st.session_state:
+                del st.session_state["damageRegNr"]
+            if "damageDetails" in st.session_state:
+                del st.session_state["damageDetails"] # Slet session state fra damage-registration hvis de findes.
             st.query_params = {}
             st.switch_page("pages/damages.py")
             
@@ -63,6 +69,7 @@ with st.container(border=True):
 
     with customerSuppBtn:
         if st.button(label="Kundeservice"):
+            st.query_params = {}
             st.switch_page("pages/customersupport.py")
 
 #Add tasks panel
@@ -122,7 +129,7 @@ if len(dataframe) > 0:
                 if st.button("Gem", key=f"save_{row['_id']}"):
                     try:
                         response = requests.put(
-                            f"http://localhost:5001/task-management-service/tasks/{row['_id']}/status",
+                            f"http://gateway:5001/task-management-service/tasks/{row['_id']}/status",
                             headers={"Authorization": controller.get("Authorization"), "Content-Type": "application/json"},
                             json={"status": new_status}
                         )

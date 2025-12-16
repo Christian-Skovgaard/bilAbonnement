@@ -12,21 +12,34 @@ services:
       - authorization-db # Wait for the mongo service to be ready
       - authorization-service
     networks:
-      - micro-net
+      - frontend-net
+      - backend-net
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./Frontend:/app
+    depends_on:
+      - gateway
+    networks:
+      - frontend-net
 
   car-catalog-service:
     container_name: car-catalog-service
     build:
       context: ./CarCatalogService/Service # Use the local directory as the build context
       dockerfile: Dockerfile # Use the Dockerfile in the local directory
-    environment:
-      MONGO_URI: "mongodb://car-catalog-db:27017/car-catalog-db" # Use the service name as the hostname
     volumes:
       - ./CarCatalogService/Service:/app # Mount the local directory to the container
     depends_on:
       - car-catalog-db # Wait for the mongo service to be ready
     networks:
-      - micro-net
+      - backend-net
 
   car-catalog-db:
     container_name: car-catalog-db
@@ -35,7 +48,7 @@ services:
       - car-catalog-db:/data/db # Persist the data locally
       - ./CarCatalogService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net      
+      - backend-net      
 
   authorization-service:
     container_name: authorization-service
@@ -47,7 +60,7 @@ services:
     depends_on:
       - authorization-db # Wait for the mongo service to be ready
     networks:
-      - micro-net      
+      - backend-net      
 
   authorization-db:
     container_name: authorization-db
@@ -61,7 +74,7 @@ services:
       - authorization-db:/data/db # Persist the data locally
       - ./AuthorizationService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net      
+      - backend-net      
 
   customer-support-service:
     container_name: customer-support-service
@@ -75,7 +88,7 @@ services:
     depends_on:
       - customer-service-db # Wait for the mongo service to be ready
     networks:
-      - micro-net  
+      - backend-net  
 
   customer-service-db:
     container_name: customer-service-db
@@ -84,7 +97,7 @@ services:
       - customer-service-db:/data/db # Persist the data locally
       - ./CustomerSupportService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net    
+      - backend-net    
 
 
   damage-registration-service:
@@ -99,7 +112,7 @@ services:
     depends_on:
       - car-catalog-db # Wait for the mongo service to be ready
     networks:
-      - micro-net
+      - backend-net
 
   damage-registration-db:
     container_name: damage-registration-db
@@ -108,7 +121,7 @@ services:
       - damage-registration-db:/data/db # Persist the data locally
       - ./DamageRegistrationService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net  
+      - backend-net  
 
   subscription-management-service:
     container_name: subscription-management-service
@@ -122,7 +135,7 @@ services:
     depends_on:
       - customer-service-db # Wait for the mongo service to be ready
     networks:
-      - micro-net  
+      - backend-net  
 
   subscription-management-db:
     container_name: subscription-management-db
@@ -131,7 +144,7 @@ services:
       - subscription-management-db:/data/db # Persist the data locally
       - ./SubscriptionManagementService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net
+      - backend-net
     
   customer-management-service:
     container_name: customer-management-service
@@ -145,7 +158,7 @@ services:
     depends_on:
       - customer-service-db # Wait for the mongo service to be ready
     networks:
-      - micro-net  
+      - backend-net  
 
   customer-management-db:
     container_name: customer-management-db
@@ -154,7 +167,7 @@ services:
       - customer-management-db:/data/db # Persist the data locally
       - ./CustomerManagementService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net
+      - backend-net
 
   task-management-service:
     container_name: task-management-service
@@ -168,7 +181,7 @@ services:
     depends_on:
       - task-management-db # Wait for the mongo service to be ready
     networks:
-      - micro-net
+      - backend-net
 
   task-management-db:
     container_name: task-management-db
@@ -177,7 +190,7 @@ services:
       - task-management-db:/data/db # Persist the data locally
       - ./TaskManagementService/Database/init:/docker-entrypoint-initdb.d
     networks:
-      - micro-net
+      - backend-net
 
 
 volumes:
@@ -199,5 +212,7 @@ volumes:
 
 
 networks:
-  micro-net:
+  frontend-net:
+    driver: bridge
+  backend-net:
     driver: bridge

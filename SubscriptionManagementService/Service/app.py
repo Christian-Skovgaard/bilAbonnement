@@ -24,7 +24,7 @@ def createSubscription():
         "startDate",    # skal være str i format yyyy-mm-dd
         "endDate",
         "pickupLocation",
-        "associatedCustommerId",
+        "associatedCustomerId",
         "associatedRegNr",
         "pricePrMonth"
     }
