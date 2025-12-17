@@ -15,33 +15,11 @@ services = {
     "task-management-service": "http://task-management-service:5010"
 }
 
-
-CAR_CATALOG_SERVICE = "http://car-catalog-service:5002" # føles som noget som burde være i .env, specielt når det er med stort
-CUSTOMER_SERVICE = "http://customer-support-service:5003/"
-AUTHORIZATION_SERVICE = "http://authorization-service:5004" # "http://authorization-service:5004"
-DAMAGE_REGISTRATION_SERVICE = "http://damage-registration-service:5005"
-
-def getJWTPublicKey():
-    url = f"{AUTHORIZATION_SERVICE}/getPublicKey"
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        key = data.get("key")
-        if key and isinstance(key, str):
-            # Convert escaped newlines to real newlines
-            key = key.encode('utf-8').decode('unicode_escape')
-        print("Successfully retrieved JWT public key!")
-        return key
-    except Exception as e:
-        print(f"ERROR getting JWT public key: {e}")
-        return None
-
 app = Flask(__name__)
 jwt = JWTManager(app)
 
 
-resp = requests.get("http://authorization-service:5004/getPublicKey")
+resp = requests.get(f"{services.get('authorization-service')}/getPublicKey")
 PUBLIC_KEY = resp.json()["key"]
 
 # jwt auth config

@@ -433,5 +433,3 @@ with subRight:
 
     if st.session_state["statusMsg"] != "":
         st.write(st.session_state["statusMsg"])
-
-    st.write(extract_filters(st.session_state))
